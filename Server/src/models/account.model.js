@@ -1,7 +1,7 @@
 import mongoose ,{Schema} from "mongoose";
 
 const accountSchema = new Schema({
-    user:{
+    userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
         required:true
@@ -29,6 +29,10 @@ const accountSchema = new Schema({
         required:true,
         enum:["active","blocked"],
         default:"active"
+    },
+    isPrimary:{
+        type:Boolean,
+        default:false
     },
 
 },{timestamps:true});
