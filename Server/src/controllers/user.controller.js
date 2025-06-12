@@ -3,7 +3,7 @@ import {User} from "../models/user.model.js";
 import {ApiErrors} from "../utils/ApiErrors.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+import  { isValidObjectId } from "mongoose";
 const generateAccessAndRefreshToken = async(userId) => {
     try {
         const user = await User.findById(userId);
@@ -64,7 +64,7 @@ const register = asyncHandler(async(req,res)=>{
        password : authType === "local" ? password : undefined,
        googleId : authType === "google" ? googleId : undefined,
     });
-    const createdUser=await User.findById(user._id).select("-password -refreshToken");
+    const createdUser=await User.findById(user._id).select("-password -refreshToken -googleId");
     if(!createdUser){
         throw new ApiErrors(404,"User not found");
     }
@@ -122,7 +122,7 @@ const login = asyncHandler(async(req,res)=>{
             httpOnly:true,
             secure:process.env.NODE_ENV==="production",
         }
-        const loggedInUser=await User.findById(user._id).select("-password -refreshToken");
+        const loggedInUser=await User.findById(user._id).select("-password -refreshToken -googleId");
         return res
         .status(200)
         .cookie("refreshToken",refreshToken,options)
@@ -148,9 +148,174 @@ const logout = asyncHandler(async(req,res)=>{
     .clearCookie("accessToken")
     .json(new ApiResponse(200,{},"User Logged Out Successfully"));
 })
+const refreshAccessToken = asyncHandler(async(req,res)=>{
+    const incomingToken=req.cookies.refreshToken||req.body.refreshToken
+    if(!incomingToken){
+        throw new ApiErrors(401,"Refresh token is required");
+    }
+    try {
+        const decoded=jwt.verify(
+            incomingToken,
+            process.env.REFRESH_TOKEN_SECRET
+        )
+        const user= await User.findById(decoded?._id)
+        if(!user){
+            throw new ApiErrors(404,"Invalid refresh token");
+        }
+        if(incomingToken!==user?.refreshToken){
+            throw new ApiErrors(401,"Refresh token is expired or used");
+        }
+        const {accessToken,newRefreshToken}=await generateAccessAndRefreshToken(user._id);
+        const options={
+            httpOnly:true,
+            secure:process.env.NODE_ENV==="production",
+        }
+        return res
+        .status(200)
+        .cookie("refreshToken",newRefreshToken,options)
+        .cookie("accessToken",accessToken,options)
+        .json(new ApiResponse(200,{accessToken,newRefreshToken},"Access token refreshed successfully"));
+    } catch (error) {
+        throw new ApiErrors(401, "Invalid refresh token"); 
+    }
+})
+const updateDetails=asyncHandler(async(req,res)=>{
+    const {email,address}=req.body
+    if(!(email||address)){
+        throw new ApiErrors(400,"Email is required");
+    }
+    const updatedUserDetails=await User.findByIdAndUpdate(req.user._id,
+        {
+            $set:{
+                email,
+                address
+            }
+        },
+        {
+            new:true
+        }
+    ).select("-password -refreshToken -googleId");
+    return res
+    .status(200)
+    .json(new ApiResponse(200,updatedUserDetails,"User details updated successfully"));
+})
+const ChangePassword=asyncHandler(async(req,res)=>{
+    const {oldPassword,newPassword}=req.body
+    const user=await User.findById(req.user._id);
+    if(!user){
+        throw new ApiErrors(404,"User not found");
+    }
+    const isPasswordCorrect=await user.isPasswordCorrect(oldPassword);
+    if(!isPasswordCorrect){
+        throw new ApiErrors(401,"Invalid old password");
+    }
+    user.password=newPassword;
+    await user.save({validateBeforeSave:false});
+    return res
+    .status(200)
+    .json(new ApiResponse(200,{}, "Password changed successfully"));
+})
+const getCurrentCustomer=asyncHandler(async(req,res)=>{
+    const user=await User.findById(req.user._id).select("-password -refreshToken -googleId");
+    if(!user){
+        throw new ApiErrors(404,"User not found");
+    }
+    return res
+    .status(200)
+    .json(new ApiResponse(200,user,"Current user fetched successfully"));
+})
+const deactivateUser = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
 
+    if (!isValidObjectId(userId)) {
+        throw new ApiErrors(400, "Invalid user ID");
+    }
+
+    if (req.user.role !== "admin") {
+        throw new ApiErrors(403, "Only admin can deactivate a user");
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new ApiErrors(404, "User not found");
+    }
+
+    if (user.isActive === false) {
+        throw new ApiErrors(400, "User is already deactivated");
+    }
+
+    user.isActive = false;
+    await user.save();
+
+    const updatedUser = await User.findById(userId).select("-password -refreshToken -googleId");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedUser, "User deactivated successfully"));
+});
+
+const activateUser=asyncHandler(async(req,res)=>{
+    const {userId}=req.params
+    if(!isValidObjectId(userId)){
+        throw new ApiErrors(400,"Invalid user ID");
+    }
+    if(req.user.role!=="admin"){
+        throw new ApiErrors(403,"Only admin can activate a user");
+    }
+    const user=await User.findById(userId);
+    if(!user){
+        throw new ApiErrors(404,"User not found");
+    }
+    if(user.isActive===true){
+        throw new ApiErrors(400,"User is already activated");
+    }
+    user.isActive=true;
+    await user.save();
+    const updatedUser = await User.findById(userId).select("-password -refreshToken -googleId");
+    if (!updatedUser) {
+        throw new ApiErrors(404, "User not found after activation");
+    }
+    return res
+    .status(200)
+    .json(new ApiResponse(200,user,"User activated successfully"));
+})
+const getUserById = asyncHandler(async (req, res) => {
+    const {userId}= req.params;
+    if (!isValidObjectId(userId)) {
+        throw new ApiErrors(400, "Invalid user ID");
+    }
+    const user = await User.findById(userId).select("-password -refreshToken -googleId");
+    if (!user) {
+        throw new ApiErrors(404, "User not found");
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "User fetched successfully"));
+})
+const getAllUsers = asyncHandler(async (req, res) => {
+
+if (req.user.role !== "admin") {
+    throw new ApiErrors(403, "Only admin can access this route");
+    }
+    const users=await User.find()
+    .select("name isActive role")
+    .sort({createdAt:-1});
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, users, "All users fetched successfully"));
+})
 export {register,
         login ,
         logout,
-        generateAccessAndRefreshToken  
+        generateAccessAndRefreshToken,
+        refreshAccessToken,
+        updateDetails,
+        ChangePassword,
+        getCurrentCustomer,
+        deactivateUser,
+        activateUser,
+        getUserById,
+        getAllUsers  
        } 
