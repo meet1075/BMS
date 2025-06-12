@@ -1,5 +1,5 @@
 import mongoose ,{Schema} from "mongoose";
-
+import bcrypt from "bcrypt";
 const accountSchema = new Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -34,7 +34,18 @@ const accountSchema = new Schema({
         type:Boolean,
         default:false
     },
+    pin:{
+        type:String,
+        required:true
+    }
 
 },{timestamps:true});
 
+if (this.isModified("pin") && this.pin) {
+    this.pin = await bcrypt.hash(this.pin, 10);
+  }
+
+userSchema.methods.isPinCorrect=async function(pin){
+    return await bcrypt.compare(pin,this.pin);
+}
 export const Account = mongoose.model("Account", accountSchema);

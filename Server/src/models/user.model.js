@@ -32,6 +32,7 @@ const userSchema=new Schema({
         required:function(){
             return this.authType==="google";
         },
+        trim:true
     },
     role:{
         type:String,
@@ -57,27 +58,20 @@ const userSchema=new Schema({
     refreshToken:{
         type:String,
     },
-    pin:{
-        type:String,
-        required:true
-    },
+    
 },{timestamps:true});
 
 userSchema.pre("save",async function (next){
     if (this.isModified("password") && this.password) {
     this.password = await bcrypt.hash(this.password, 10);
     } 
-    if (this.isModified("pin") && this.pin) {
-    this.pin = await bcrypt.hash(this.pin, 10);
-  }
+    
     next();
 })
 userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password);
 }
-userSchema.methods.isPinCorrect=async function(password){
-    return await bcrypt.compare(pin,this.pin);
-}
+
 userSchema.methods.generateAccessToken=function(){
     return jwt.sign({
         _id:this._id,
@@ -86,7 +80,7 @@ userSchema.methods.generateAccessToken=function(){
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-        expiresIn:ACCESS_TOKEN_EXPIRY
+        expiresIn:process.env.ACCESS_TOKEN_EXPIRY
     }
     )}
 userSchema.methods.generateRefreshToken=function(){
@@ -95,7 +89,7 @@ userSchema.methods.generateRefreshToken=function(){
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-        expiresIn:REFRESH_TOKEN_EXPIRY
+        expiresIn:process.env.REFRESH_TOKEN_EXPIRY
     }
     )
 }
