@@ -37,12 +37,20 @@ const register = asyncHandler(async(req,res)=>{
         throw new ApiErrors(400, "Google ID is required for Google signup");
     }
 
-    const userExists=await User.findOne({
-        $or:[{email},{name}]
+    const userExists = await User.findOne({
+        $or: [{ email }, { contact }]
     });
-    if(userExists){
-        throw new ApiErrors(400,"User already exists");
+
+    if (userExists) {
+        let duplicateField = "";
+     if (userExists.email === email) {
+        duplicateField = "email";
+     } else if (userExists.contact === contact) {
+        duplicateField = "contact";
     }
+
+  throw new ApiErrors(400, `User already exists with same ${duplicateField}`);
+}
     let assignedRole = "customer"; 
 
     const existingUsersCount = await User.countDocuments();
@@ -184,15 +192,16 @@ const refreshAccessToken = asyncHandler(async(req,res)=>{
     }
 })
 const updateDetails=asyncHandler(async(req,res)=>{
-    const {email,address}=req.body
-    if(!(email||address)){
-        throw new ApiErrors(400,"Email is required");
+    const {email,address,contact}=req.body
+    if(!(email||address||contact)){
+        throw new ApiErrors(400,"details is required");
     }
     const updatedUserDetails=await User.findByIdAndUpdate(req.user._id,
         {
             $set:{
                 email,
-                address
+                address,
+                contact
             }
         },
         {

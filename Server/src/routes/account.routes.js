@@ -1,8 +1,15 @@
 import { Router } from "express";
-import { createAccount } from "../controllers/account.controller.js";
+import { createAccount,deleteAccount,getAccountDetails,getAllAccounts,getAllAccountsByUserId,getAllCurrentAccounts,getAllSavingsAccounts,updatePin } from "../controllers/account.controller.js";
 import { verifyJWT, verifyRoles } from "../middlewares/auth.middleware.js";
 const router = Router();
 router.use(verifyJWT);
 router.route("/create-account").post(verifyRoles("customer","admin"),createAccount);
+router.route("/delete-account/:accountId").delete(verifyRoles("customer","admin"),deleteAccount);
+router.route("/get-account-details/:accountId").get(verifyRoles("customer","admin"),getAccountDetails);
+router.route("/get-all-accounts").get(verifyRoles("admin"),getAllAccounts);
+router.route("/get-all-accounts-by-user/:userId").get(verifyRoles("customer","admin"),getAllAccountsByUserId);
+router.route("/get-all-savings-accounts").get(verifyRoles("admin"),getAllSavingsAccounts);
+router.route("/get-all-current-accounts").get(verifyRoles("admin"),getAllCurrentAccounts);
+router.route("/update-pin/:accountId").patch(verifyRoles("customer","admin"),updatePin);
 
 export default router;
