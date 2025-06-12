@@ -25,7 +25,7 @@ const generateAccessAndRefreshToken = async(userId) => {
 };
 
 const register = asyncHandler(async(req,res)=>{
-    const {name,email,contact,address,authType,googleId,password}=req.body;
+    const {name,email,contact,address,authType,googleId,password,totalAccounts,role}=req.body;
     if([name,email,contact,address,authType].some((field)=>field?.trim()==="")){
         throw new ApiErrors(400,"All fields are required");
     };
@@ -43,12 +43,15 @@ const register = asyncHandler(async(req,res)=>{
     if(userExists){
         throw new ApiErrors(400,"User already exists");
     }
-    let assignedRole="customer";
-    const userCount=await User.countDocuments();
-    if(userCount===0){
-        assignedRole="admin";
+    let assignedRole = "customer"; 
+
+    const existingUsersCount = await User.countDocuments();
+    if (existingUsersCount === 0) {
+        assignedRole = "admin";
     }
-    else if (role === "admin") {
+
+    
+    if (role === "admin") {
         if (!req.user || req.user.role !== "admin") {
             throw new ApiErrors(403, "Only admins can create another admin");
         }
@@ -63,6 +66,7 @@ const register = asyncHandler(async(req,res)=>{
        authType, 
        password : authType === "local" ? password : undefined,
        googleId : authType === "google" ? googleId : undefined,
+       totalAccounts: totalAccounts || 0,
     });
     const createdUser=await User.findById(user._id).select("-password -refreshToken -googleId");
     if(!createdUser){

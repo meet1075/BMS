@@ -27,7 +27,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 import userRoutes from './routes/user.routes.js';
+import accountRoutes from './routes/account.routes.js';
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/accounts', accountRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

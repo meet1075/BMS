@@ -44,7 +44,8 @@ const userSchema=new Schema({
         type:String,
         required:true,
         trim:true,
-        index:true
+        index:true,
+        unique:true,
     },
     address:{
         type:String,
@@ -58,14 +59,16 @@ const userSchema=new Schema({
     refreshToken:{
         type:String,
     },
-    
+    totalAccounts:{
+        type:Number,
+        default:0
+    }
 },{timestamps:true});
 
 userSchema.pre("save",async function (next){
     if (this.isModified("password") && this.password) {
     this.password = await bcrypt.hash(this.password, 10);
     } 
-    
     next();
 })
 userSchema.methods.isPasswordCorrect=async function(password){

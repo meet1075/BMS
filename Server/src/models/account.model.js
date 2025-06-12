@@ -27,8 +27,8 @@ const accountSchema = new Schema({
     status:{
         type:String,
         required:true,
-        enum:["active","blocked"],
-        default:"active"
+        enum:["activate","deactivate"],
+        default:"activate"
     },
     isPrimary:{
         type:Boolean,
@@ -41,11 +41,15 @@ const accountSchema = new Schema({
 
 },{timestamps:true});
 
-if (this.isModified("pin") && this.pin) {
-    this.pin = await bcrypt.hash(this.pin, 10);
-  }
-
-userSchema.methods.isPinCorrect=async function(pin){
-    return await bcrypt.compare(pin,this.pin);
+accountSchema.pre("save",async function(next){
+    if(this.isModified("pin")&&this.pin){
+        this.pin = await bcrypt.hash(this.pin, 10);
+    }
+    next();
+})
+accountSchema.methods.isPasswordCorrect=async function (pin) {
+        return await bcrypt.compare(pin,this.pin);
+    
 }
+
 export const Account = mongoose.model("Account", accountSchema);
