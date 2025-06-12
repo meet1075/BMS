@@ -151,5 +151,6 @@ const logout = asyncHandler(async(req,res)=>{
 
 export {register,
         login ,
-        logout,  
+        logout,
+        generateAccessAndRefreshToken  
        } 
