@@ -24,12 +24,7 @@ const transactionSchema = new Schema({
         type: Number,
         required: true,
         min: 0
-    },
-    note: {
-        type: String,
-        trim: true,
-        default: ""
-    },
+    }, 
     status: {
         type: String,
         enum: [ "successful", "failed"],
@@ -40,6 +35,11 @@ const transactionSchema = new Schema({
         unique: true,
         trim: true,
         index: true
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
 },{ timestamps: true });
 

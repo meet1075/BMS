@@ -5,6 +5,7 @@ import { Account } from "../models/account.model.js";
 import { User } from "../models/user.model.js";
 import generateUniqueAccountNumber from "../utils/generateAccountNumber.js";
 import generatePin from "../utils/generatePinforAccountNumber.js";
+import { isValidObjectId } from "mongoose";
 const createAccount=asyncHandler(async (req, res) => {
     const {accountType,balance} = req.body;
 
@@ -51,7 +52,7 @@ const createAccount=asyncHandler(async (req, res) => {
 
 const deleteAccount=asyncHandler(async (req, res) => {
     const {accountId} = req.params;
-    if (!accountId) {
+    if (!isValidObjectId(accountId)) {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account=await Account.findByIdAndDelete(accountId);
@@ -73,7 +74,7 @@ const deleteAccount=asyncHandler(async (req, res) => {
 
 const getAccountDetails = asyncHandler(async (req, res) => {
     const {accountId}=req.params;
-    if (!accountId) {
+    if (!isValidObjectId(accountId)) {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account= await Account.findById(accountId)
@@ -102,7 +103,7 @@ const getAllAccounts = asyncHandler(async (req, res) => {
 
 const getAllAccountsByUserId = asyncHandler(async (req, res) => {
     const {userId} = req.params;
-    if (!userId) {
+    if (!isValidObjectId(userId)) {
         throw new ApiErrors(400, "User ID is required");
     }
     const user=await User.findById(userId);
@@ -147,7 +148,7 @@ const getAllCurrentAccounts = asyncHandler(async (req, res) => {
 const updatePin = asyncHandler(async (req, res) => {
     const { accountId } = req.params;
     const {oldPin, newPin} = req.body;
-    if (!accountId || !oldPin || !newPin) {
+    if (!isValidObjectId(accountId) || !oldPin || !newPin) {
         throw new ApiErrors(400, "Account ID, old PIN, and new PIN are required");
     }
     const account = await Account.findById(accountId);  
@@ -166,7 +167,7 @@ const updatePin = asyncHandler(async (req, res) => {
 
 const setPrimaryAccount= asyncHandler(async(req,res)=>{
     const { accountId } = req.params;
-    if (!accountId) {
+    if (!isValidObjectId(accountId)) {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account = await Account.findById(accountId);
@@ -194,7 +195,7 @@ const setPrimaryAccount= asyncHandler(async(req,res)=>{
 
 const deactivateAccount= asyncHandler(async(req,res)=>{
     const {accountId} = req.params;
-    if (!accountId) {
+    if (!isValidObjectId(accountId)) {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account = await Account.findById(accountId);
@@ -213,7 +214,7 @@ const deactivateAccount= asyncHandler(async(req,res)=>{
 
 const activateAccount= asyncHandler(async(req,res)=>{
         const {accountId} = req.params;
-    if (!accountId) {
+    if (!isValidObjectId(accountId)) {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account = await Account.findById(accountId);
@@ -232,7 +233,7 @@ const activateAccount= asyncHandler(async(req,res)=>{
 
 const checkBalance= asyncHandler(async(req,res)=>{
     const {accountId}= req.params;
-    if (!accountId) {
+    if (!isValidObjectId(accountId)) {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account=await Account.findById(accountId)

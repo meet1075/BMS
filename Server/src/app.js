@@ -28,8 +28,10 @@ app.use(passport.session());
 
 import userRoutes from './routes/user.routes.js';
 import accountRoutes from './routes/account.routes.js';
+import transactionRoutes from './routes/transaction.routes.js';
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/accounts', accountRoutes);
+app.use('/api/v1/transactions', transactionRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
