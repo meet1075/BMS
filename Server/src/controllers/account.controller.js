@@ -164,14 +164,86 @@ const updatePin = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "PIN updated successfully"));
 })
 
-const setPrimaryAccount= asyncHandler(async(req,res)=>{})
+const setPrimaryAccount= asyncHandler(async(req,res)=>{
+    const { accountId } = req.params;
+    if (!accountId) {
+        throw new ApiErrors(400, "Account ID is required");
+    }
+    const account = await Account.findById(accountId);
+    if (!account) {
+        throw new ApiErrors(404, "Account not found");
+    }
+    const user= await User.findById(account.userId);
+    if (!user) {
+        throw new ApiErrors(404, "User not found");
+    }
+    if (account.isPrimary === true) {
+        throw new ApiErrors(400, "This account is already set as primary");
+    }
+    const existingPrimaryAccount = await Account.findOne({ userId: user._id, isPrimary: true });
+    if (existingPrimaryAccount) {
+        existingPrimaryAccount.isPrimary = false;
+        await existingPrimaryAccount.save();
+    }
+    account.isPrimary = true;
+    await account.save();
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { account }, "Primary account set successfully"));
+})
 
-const deactivateAccount= asyncHandler(async(req,res)=>{})
+const deactivateAccount= asyncHandler(async(req,res)=>{
+    const {accountId} = req.params;
+    if (!accountId) {
+        throw new ApiErrors(400, "Account ID is required");
+    }
+    const account = await Account.findById(accountId);
+    if (!account) {
+        throw new ApiErrors(404, "Account not found");
+    }
+    if (account.status === "deactivate") {
+        throw new ApiErrors(400, "Account is already deactivated");
+    }
+    account.status = "deactivate";
+    await account.save();   
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { account }, "Account deactivated successfully"));
+})
 
-const activateAccount= asyncHandler(async(req,res)=>{})
+const activateAccount= asyncHandler(async(req,res)=>{
+        const {accountId} = req.params;
+    if (!accountId) {
+        throw new ApiErrors(400, "Account ID is required");
+    }
+    const account = await Account.findById(accountId);
+    if (!account) {
+        throw new ApiErrors(404, "Account not found");
+    }
+    if (account.status === "activate") {
+        throw new ApiErrors(400, "Account is already activated");
+    }
+    account.status = "activate";
+    await account.save();   
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { account }, "Account activated successfully"));
+})
 
-const checkBalance= asyncHandler(async(req,res)=>{})
-
+const checkBalance= asyncHandler(async(req,res)=>{
+    const {accountId}= req.params;
+    if (!accountId) {
+        throw new ApiErrors(400, "Account ID is required");
+    }
+    const account=await Account.findById(accountId)
+    .select("balance");
+    if (!account) {
+        throw new ApiErrors(404, "Account not found");
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { balance: account.balance }, "Account balance retrieved successfully"));
+})
 
 export {
     createAccount,
