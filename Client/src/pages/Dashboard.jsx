@@ -1,4 +1,3 @@
-import NavBar from "../components/NavBar.jsx"
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { FiCreditCard } from "react-icons/fi";
 import { RiAccountBox2Fill } from "react-icons/ri";
@@ -6,10 +5,9 @@ import { FiPlus } from "react-icons/fi";
 import { AiOutlineEye } from "react-icons/ai";
 import { FaArrowRightLong } from "react-icons/fa6";
 
-
 function Dashboard() {
   return (
-    <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:h-screen h-screen-full'>
+    <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div className="px-35  py-8">
         <h1 className="font-bold text-3xl text-gray-900 pt-16 mb-2">Welcome back, John Doe</h1>
         <p className="text-gray-600">Manage your accounts and transactions securely</p>
@@ -48,7 +46,7 @@ function Dashboard() {
           <div className="text-gray-900 font-bold text-2xl">
             Your Accounts
           </div>
-          <div  className=" text-white cursor-pointer hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-800 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg font-semibold py-2 px-4 text-center">
+          <div  className=" text-white cursor-pointer hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-800  transition-all duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg font-semibold py-2 px-4 text-center">
             <button className="flex  items-center gap-3 cursor-pointer"><FiPlus className="text-xl"/> Add Account</button>
           </div>
         </div>
@@ -73,7 +71,7 @@ function Dashboard() {
               <p className="flex items-center gap-2 text-gray-900 font-bold text-2xl">Rs 00.00/- <AiOutlineEye className="text-xl text-gray-500"/></p>
             </div>
             <div>
-              <button className="flex items-center text-blue-600 hover:text-blue-700 cursor-pointer font-semibold gap-2">View Details<FaArrowRightLong className="mt-1"/></button>
+              <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2">View Details<FaArrowRightLong className="mt-1"/></button>
             </div>
           </div>
           <div>
@@ -82,6 +80,14 @@ function Dashboard() {
             </div>
           </div>
           </div>
+        </div>
+      </div>
+      <div className="px-35 py-6">
+        <div className="flex flex-col items-center justify-center rounded-lg bg-white border border-gray-200  p-8">
+          < FiCreditCard  className="text-gray-300 h-[100px] w-[50px] -mt-6"/>
+          <p className="font-semibold text-xl text-gray-800">No accounts yet</p>
+          <p className="text-gray-600 py-3">Create your first account to get started with banking</p>
+          <button className="text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg px-6 py-3 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 mt-2">Create Account</button>
         </div>
       </div>
    </div>
