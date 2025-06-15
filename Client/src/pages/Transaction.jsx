@@ -17,6 +17,7 @@ const transactions = [
     date: 'Jun 14, 2025, 01:31 AM',
     status: 'completed',
     direction: 'up',
+    Account:'savings accounts'
   },
   {
     id: 2,
@@ -25,6 +26,8 @@ const transactions = [
     date: 'Jun 14, 2025, 01:31 AM',
     status: 'completed',
     direction: 'down',
+    Account:'savings accounts'
+
   },
   {
     id: 3,
@@ -33,6 +36,8 @@ const transactions = [
     date: 'Jun 14, 2025, 01:31 AM',
     status: 'completed',
     direction: 'up',
+    Account:'savings accounts'
+
   },
   {
     id: 4,
@@ -41,6 +46,8 @@ const transactions = [
     date: 'Jun 14, 2025, 01:31 AM',
     status: 'completed',
     direction: 'up',
+    Account:'savings accounts'
+
   },
 ];
 const [filterType, setFilterType] = useState("All Types");
@@ -88,8 +95,7 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
       {/* Transaction Type Dropdown */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
-        <select className="w-full border border-gray-300 rounded-md px-3 py-2 "   value={filterType}
-  onChange={(e) => setFilterType(e.target.value)}>
+        <select className="w-full border border-gray-300 rounded-md px-3 py-2 "   value={filterType}onChange={(e) => setFilterType(e.target.value)}>
           <option>All Types</option>
           <option>Deposit</option>
           <option>Withdraw</option>
@@ -229,7 +235,7 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
                 <FiPlus />
               )} Rs {tx.amount}.00/-
             </p>
-            <p className="text-[14px] text-gray-500 pt-2">Savings Account</p>
+            <p className="text-[14px] text-gray-500 pt-2">{tx.Account}</p>
           </div>
         </div>
       </div>

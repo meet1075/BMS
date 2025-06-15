@@ -4,8 +4,47 @@ import { RiAccountBox2Fill } from "react-icons/ri";
 import { FiPlus } from "react-icons/fi";
 import { AiOutlineEye } from "react-icons/ai";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { PiWallet  } from "react-icons/pi";
 
 function Dashboard() {
+
+  const Accounts=[
+    {
+      id: 1,
+      type: 'Savings Account',
+      number: '98765432',
+      balance: 10,
+      pin: '3142',
+      status: 'active',
+      isPrimary: true,
+    },
+    {
+      id: 2,
+      type: 'Current Account',
+      number: '23131234',
+      balance: 0.00,
+      pin: '1234',
+      status: 'inactive',
+      isPrimary: false,
+    },
+    {
+      id: 3,
+      type: 'Savings Account',
+      number: '12345678',
+      balance: 15.00,
+      pin: '5678',
+      status: 'active',
+      isPrimary: false,
+    },
+  ]
+  let totalbalance = 0;
+  Accounts.forEach((account) => {
+    totalbalance += account.balance;
+  });
+  let activeaccounts=0
+  Accounts.map((ac)=>{ac.status==="active"?activeaccounts++:activeaccounts=activeaccounts})
+  
+  let primaryAccount=Accounts.length==0?"No Account": Accounts.find((ac)=>ac.isPrimary===true)?.number ;
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div className="px-35  py-8">
@@ -16,7 +55,7 @@ function Dashboard() {
         <div  className=" bg-gradient-to-r from-blue-500 to-blue-600 shadow-sm rounded-2xl p-6 flex items-center  justify-between">
           <div>
             <p className="text-blue-100 font-semibold">Total Balance</p>
-            <p className="text-2xl font-bold text-white">Rs 00.00/-</p>
+            <p className="text-2xl font-bold text-white">Rs {totalbalance}/-</p>
           </div>
           <div className="text-blue-100 font-semibold text-3xl">
             <FaArrowTrendUp />
@@ -25,7 +64,7 @@ function Dashboard() {
         <div  className="bg-white rounded-2xl p-6 flex items-center border border-gray-200 justify-between">
           <div>
             <p className="text-gray-600 font-semibold">Active Accounts</p>
-            <p className="text-2xl font-bold text-gray-900">0</p>
+            <p className="text-2xl font-bold text-gray-900">{activeaccounts}</p>
           </div>
           <div className="text-gray-600 font-semibold text-3xl">
             <FiCreditCard />
@@ -34,13 +73,14 @@ function Dashboard() {
         <div  className="bg-white  rounded-2xl p-6 flex items-center border border-gray-200 justify-between">
           <div>
             <p className="text-gray-600 font-semibold">Primary Account</p>
-            <p className="text-2xl font-bold text-gray-900">123456789</p>
+            <p className="text-2xl font-bold text-gray-900">{primaryAccount}</p>
           </div>
           <div className="text-gray-600 font-semibold text-3xl">
             <RiAccountBox2Fill />
           </div>
         </div>
       </div>
+      {Accounts.length>0?
       <div>
         <div className="flex justify-between items-center py-4 px-35 ">
           <div className="text-gray-900 font-bold text-2xl">
@@ -52,23 +92,32 @@ function Dashboard() {
         </div>
 
         <div className="px-35 py-4">
-          <div className="bg-white rounded-xl border border-gray-200">
+            {Accounts.map((ac,index)=>(
+
+          <div key={ac.id||index} className="bg-white rounded-xl border border-gray-200 mb-5">
           <div className="flex justify-between items-center px-6 py-3">
             <div  className="flex items-center gap-4">
-              <div><FiCreditCard className=" rounded-xl p-2 bg-gradient-to-r from-blue-600 to-indigo-600 h-[40px] w-[45px]  text-white "/></div>
               <div>
-                <p className="text-gray-900 font-semibold text-lg">Savings Account</p>
-                <p className="text-gray-500">****2438</p>
+                {ac.type === "Savings Account" ? (
+                  <FiCreditCard className="rounded-xl p-2 bg-gradient-to-r from-blue-600 to-indigo-600 h-[40px] w-[45px] text-white" />
+                ) : (
+                  <PiWallet  className="rounded-xl p-2 bg-gradient-to-r from-blue-600 to-indigo-600 h-[40px] w-[45px] font-bold text-white" />
+                )}
+              </div>
+
+              <div>
+                <p className="text-gray-900 font-semibold text-lg">{ac.type}</p>
+                <p className="text-gray-500">{ac.number}</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <p className="font-medium text-[12px] text-green-600 rounded-full bg-green-200 px-2 py-1">active</p>
-              <p className="font-medium rounded-full text-[12px] bg-yellow-200 text-amber-800 px-2 py-1">Primary</p>
+              <p className="font-medium text-[12px] text-green-600 rounded-full bg-green-200 px-2 py-1">{ac.status}</p>
+              <p className="font-medium rounded-full text-[12px] bg-yellow-200 text-amber-800 px-2 py-1">{ac.isPrimary===true?"Primary":"not Primary"}</p>
             </div>
           </div>
           <div className="flex justify-between items-center px-6 py-3 ">
             <div>
-              <p className="flex items-center gap-2 text-gray-900 font-bold text-2xl">Rs 00.00/- <AiOutlineEye className="text-xl text-gray-500"/></p>
+              <p className="flex items-center gap-2 text-gray-900 font-bold text-2xl">Rs {ac.balance}/- <AiOutlineEye className="text-xl text-gray-500"/></p>
             </div>
             <div>
               <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2">View Details<FaArrowRightLong className="mt-1"/></button>
@@ -76,12 +125,15 @@ function Dashboard() {
           </div>
           <div>
             <div className="justify-between items-center px-6 py-3">
-              <p className="text-gray-500">PIN: 3142</p>
+              <p className="text-gray-500">PIN: {ac.pin}</p>
             </div>
           </div>
+          
           </div>
+          ))}
         </div>
       </div>
+      :
       <div className="px-35 py-6">
         <div className="flex flex-col items-center justify-center rounded-lg bg-white border border-gray-200  p-8">
           < FiCreditCard  className="text-gray-300 h-[100px] w-[50px] -mt-6"/>
@@ -90,7 +142,9 @@ function Dashboard() {
           <button className="text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg px-6 py-3 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 mt-2">Create Account</button>
         </div>
       </div>
+}
    </div>
+        
   )
 }
 
