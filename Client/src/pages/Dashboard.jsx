@@ -94,7 +94,7 @@ function Dashboard() {
         <div className="px-35 py-4">
             {Accounts.map((ac,index)=>(
 
-          <div key={ac.id||index} className="bg-white rounded-xl border border-gray-200 mb-5">
+          <div key={ac.id||index} className="bg-white rounded-xl border border-gray-200 hover:shadow-lg mb-5">
           <div className="flex justify-between items-center px-6 py-3">
             <div  className="flex items-center gap-4">
               <div>

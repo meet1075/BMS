@@ -180,16 +180,16 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
         </div> */}
         
         <div className="px-50 py-4">
-  <div className="bg-white rounded-xl border border-gray-200">
-    <p className="text-xl font-bold text-gray-800 p-6">
+  <div className="bg-white rounded-xl border border-gray-200 ">
+    <p className="text-xl font-bold text-gray-800 p-6 ">
       {filteredTransactions.length} Transactions
     </p>
     <hr className="border-t border-gray-200 mx-6" />
 
     
     {filteredTransactions.map((tx, index) => (
-      <div key={tx.id || index}>
-        {index !== 0 && <hr className="border-t border-gray-200 mx-6" />}
+      <div className="hover:px-2 " key={tx.id || index}>
+        {index !== 0 && <hr className="border-t border-gray-200 mx-6 " />}
         <div className="flex justify-between items-center px-6 py-3">
           {/* Left side */}
           <div className="flex items-center gap-4">
