@@ -5,9 +5,9 @@ import { FiPlus } from "react-icons/fi";
 import { AiOutlineEye } from "react-icons/ai";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { PiWallet  } from "react-icons/pi";
-
+import { useNavigate } from "react-router-dom";
 function Dashboard() {
-
+const navigate = useNavigate();
   const Accounts=[
     {
       id: 1,
@@ -112,7 +112,7 @@ function Dashboard() {
             </div>
             <div className="flex gap-4">
               <p className="font-medium text-[12px] text-green-600 rounded-full bg-green-200 px-2 py-1">{ac.status}</p>
-              <p className="font-medium rounded-full text-[12px] bg-yellow-200 text-amber-800 px-2 py-1">{ac.isPrimary===true?"Primary":"not Primary"}</p>
+              <p className="font-medium rounded-full text-[12px] bg-yellow-100 text-amber-800 px-2 py-1">{ac.isPrimary===true?"Primary":"not Primary"}</p>
             </div>
           </div>
           <div className="flex justify-between items-center px-6 py-3 ">
@@ -120,7 +120,7 @@ function Dashboard() {
               <p className="flex items-center gap-2 text-gray-900 font-bold text-2xl">Rs {ac.balance}/- <AiOutlineEye className="text-xl text-gray-500"/></p>
             </div>
             <div>
-              <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2">View Details<FaArrowRightLong className="mt-1"/></button>
+              <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2" onClick={()=>{navigate('/account-detail')}} >View Details<FaArrowRightLong className="mt-1"/></button>
             </div>
           </div>
           <div>
