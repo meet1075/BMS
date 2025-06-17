@@ -9,11 +9,8 @@ import { isValidObjectId } from "mongoose";
 const createAccount=asyncHandler(async (req, res) => {
     const {accountType,balance} = req.body;
 
-    if (!accountType || balance === undefined) {
-      throw new ApiErrors(400, "Account type and balance are required");
-    }
-    if (typeof balance !== "number" || balance < 10) {
-      throw new ApiErrors(400, "Minimum balance should be ₹10");
+    if (!accountType ) {
+      throw new ApiErrors(400, "Account type required");
     }
     const user= await User.findById(req.user._id);
     if(!user){
@@ -27,7 +24,7 @@ const createAccount=asyncHandler(async (req, res) => {
         userId: user._id,
         accountType,
         accountNumber,
-        balance,
+        balance:0,
         pin: plainpin,
         status: "activate",
         isPrimary,

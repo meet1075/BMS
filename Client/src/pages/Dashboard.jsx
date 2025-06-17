@@ -66,7 +66,9 @@ function Dashboard() {
             Your Accounts
           </div>
           <div  className=" text-white cursor-pointer hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-800  transition-all duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg font-semibold py-2 px-4 text-center">
-            <button className="flex  items-center gap-3 cursor-pointer"><FiPlus className="text-xl"/> Add Account</button>
+            <Link to="/createaccount">
+              <button className="flex items-center gap-3 cursor-pointer"><FiPlus className="text-xl"/> Add Account</button>
+            </Link>
           </div>
         </div>
 
@@ -121,7 +123,9 @@ function Dashboard() {
           < FiCreditCard  className="text-gray-300 h-[100px] w-[50px] -mt-6"/>
           <p className="font-semibold text-xl text-gray-800">No accounts yet</p>
           <p className="text-gray-600 py-3">Create your first account to get started with banking</p>
-          <button className="text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg px-6 py-3 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 mt-2">Create Account</button>
+          <Link to="/createaccount">
+            <button className="text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg px-6 py-3 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 mt-2">Create Account</button>
+          </Link>
         </div>
       </div>
 }
