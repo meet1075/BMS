@@ -5,9 +5,22 @@ import { IoMdArrowRoundDown } from "react-icons/io";
 import { MdArrowOutward , MdEmail} from "react-icons/md";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { HiOutlineHashtag } from "react-icons/hi";
-import { GoShieldCheck } from "react-icons/go";
-
+import { useParams } from "react-router-dom";
+import { AccountContext } from "../context/AccountContext";
+import React, { useContext } from 'react';
+// import { GoShieldCheck } from "react-icons/go";
+import { useState } from "react";
 function AccountDetails() {
+    const {id}=useParams();
+    const {accounts} = useContext(AccountContext);
+
+    const account = accounts.find((ac)=> ac.id === parseInt(id));
+    if (!account) {
+  return <div className="p-6 text-red-500 text-center">Account not found</div>;
+}
+let checkPrimary= account.isPrimary ? "Yes" : "No";   
+let accountType=account.type === "Savings Account" ? "Savings" : "Current";
+    // const accountTransactions=transactions.filter((tx)=>tx.accountId === parseInt(id));
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div >
@@ -17,12 +30,12 @@ function AccountDetails() {
                 <div className='flex items-center gap-4'>
                     <div><FiCreditCard className="rounded-xl p-2 bg-white/30 shadow-blur-sm h-[50px] w-[55px] text-white" /></div>
                     <div>
-                        <h1 className='text-white text-2xl font-bold capitalize'>savings Account</h1>
-                        <p className='text-blue-50'>Account Number: 1234567890</p>
+                        <h1 className='text-white text-2xl font-bold capitalize'>{ account.type}</h1>
+                        <p className='text-blue-50'>Account Number:{account.number}</p>
                     </div>
                 </div>
                 <div>
-                    <p className="flex justify-center items-center gap-2 text-white text-3xl font-bold">Rs 30.00/- <AiOutlineEye /></p>
+                    <p className="flex justify-center items-center gap-2 text-white text-3xl font-bold">Rs {account.balance}/- <AiOutlineEye /></p>
                     <p className="text-blue-100">Available Balance</p>
                 </div> 
                 </div>
@@ -57,7 +70,7 @@ function AccountDetails() {
                        <div>
                         <div className="flex gap-6 py-3 px-4">
                             <p className="pt-3"><RiAccountCircleFill className="w-6 h-6"/></p>
-                            <div flex flex-col>
+                            <div className="flex flex-col">
                                 <p className="text-gray-600">Account Holder</p>
                                 <p className="text-gray-900 font-semibold">John Doe</p>
                             </div>
@@ -73,25 +86,25 @@ function AccountDetails() {
                             <p className="pt-3"><HiOutlineHashtag className="w-6 h-6"/></p>
                             <div>
                                 <p className="text-gray-600">Account Number</p>
-                                <p className="text-gray-900 font-semibold">9652972438</p>
+                                <p className="text-gray-900 font-semibold">{account.number}</p>
                             </div>
                         </div>
-                        <div className="flex gap-6 py-3 px-4">
+                        {/* <div className="flex gap-6 py-3 px-4">
                             <p className="pt-3"><GoShieldCheck className="w-6 h-6"/></p>
                             <div>
                                 <p className="text-gray-600">Account PIN</p>
                                 <p className="text-gray-900 font-semibold">7858</p>
                             </div>
-                        </div>
+                        </div> */}
                              <hr className="border-t border-gray-200 mx-6" />
                              <div className="px-4 py-3">
                                <div className="flex justify-between items-center py-2">
                                 <p className="text-gray-600">Account Status</p>
-                                <p className="font-medium text-[12px] text-green-600 rounded-full bg-green-200 px-2 py-1">active</p>
+                                <p className="font-medium text-[12px] text-green-600 rounded-full bg-green-200 px-2 py-1">{account.status}</p>
                                </div>
                                <div className="flex justify-between items-center">
                                 <p className="text-gray-800">Primary Account</p>
-                                <p className="font-medium rounded-full text-[12px] bg-yellow-100 text-amber-800 px-3 py-1">Yes</p>
+                                <p className="font-medium rounded-full text-[12px] bg-yellow-100 text-amber-800 px-3 py-1">{checkPrimary}</p>
                                </div>
                              </div>
                        </div>
@@ -101,11 +114,11 @@ function AccountDetails() {
                      <div>
                         <div className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Account Type</p>
-                            <p className="text-gray-900 font-semibold">savings</p>
+                            <p className="text-gray-900 font-semibold">{accountType}</p>
                         </div>
                         <div className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Created Date</p>
-                            <p className="text-gray-900 font-semibold">Jun 14, 2025, 01:29 AM</p>
+                            <p className="text-gray-900 font-semibold">{account.createdAt}</p>
                         </div>
                         <div  className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Total Transactions</p>
@@ -113,7 +126,7 @@ function AccountDetails() {
                         </div>
                         <div  className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Available Balance</p>
-                            <p className="text-green-600 text-lg font-bold">Rs 60.00/-</p>
+                            <p className="text-green-600 text-lg font-bold">Rs {account.balance}/-</p>
                         </div>
                      </div>
                 </div>

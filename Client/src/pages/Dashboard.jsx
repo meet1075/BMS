@@ -6,43 +6,53 @@ import { AiOutlineEye } from "react-icons/ai";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { PiWallet  } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { AccountContext } from "../context/AccountContext.jsx";
+import { useContext, useEffect } from "react";
+import Accounts from "../data/accounts.js"; 
+
 function Dashboard() {
-const navigate = useNavigate();
-  const Accounts=[
-    {
-      id: 1,
-      type: 'Savings Account',
-      number: '98765432',
-      balance: 10,
-      pin: '3142',
-      status: 'active',
-      isPrimary: true,
-    },
-    {
-      id: 2,
-      type: 'Current Account',
-      number: '23131234',
-      balance: 0.00,
-      pin: '1234',
-      status: 'inactive',
-      isPrimary: false,
-    },
-    {
-      id: 3,
-      type: 'Savings Account',
-      number: '12345678',
-      balance: 15.00,
-      pin: '5678',
-      status: 'active',
-      isPrimary: false,
-    },
-  ]
+  const {setAccounts,accounts} =  useContext(AccountContext);
+  useEffect(()=>{setAccounts(Accounts)},[])
+  // const Accounts=[
+  //   {
+  //     id: 1,
+  //     type: 'Savings Account',
+  //     number: '98765432',
+  //     balance: 10,
+  //     pin: '3142',
+  //     status: 'active',
+  //     isPrimary: true,
+  //     createdAt: '2025-06-14T01:31:00Z',
+  //   },
+  //   {
+  //     id: 2,
+  //     type: 'Current Account',
+  //     number: '23131234',
+  //     balance: 0.00,
+  //     pin: '1234',
+  //     status: 'inactive',
+  //     isPrimary: false,
+  //     createdAt: '2025-06-14T01:31:00Z',
+  //   },
+  //   {
+  //     id: 3,
+  //     type: 'Savings Account',
+  //     number: '12345678',
+  //     balance: 15.00,
+  //     pin: '5678',
+  //     status: 'active',
+  //     isPrimary: false,
+  //     createdAt: '2025-06-14T01:31:00Z',
+  //   },
+  // ]
   let totalbalance = 0;
-  Accounts.forEach((account) => {
+  accounts.forEach((account) => {
     totalbalance += account.balance;
   });
   let activeaccounts=0
-  Accounts.map((ac)=>{ac.status==="active"?activeaccounts++:activeaccounts=activeaccounts})
+  accounts.map((ac)=>{ac.status==="active"?activeaccounts++:activeaccounts=activeaccounts})
   
   let primaryAccount=Accounts.length==0?"No Account": Accounts.find((ac)=>ac.isPrimary===true)?.number ;
   return (
@@ -119,9 +129,12 @@ const navigate = useNavigate();
             <div>
               <p className="flex items-center gap-2 text-gray-900 font-bold text-2xl">Rs {ac.balance}/- <AiOutlineEye className="text-xl text-gray-500"/></p>
             </div>
-            <div>
-              <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2" onClick={()=>{navigate('/account-detail')}} >View Details<FaArrowRightLong className="mt-1"/></button>
-            </div>
+            <Link to={`/account-detail/${ac.id}`} key={ac.id}>
+              <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2">
+                View Details <FaArrowRightLong className="mt-1" />
+              </button>
+            </Link>
+
           </div>
           <div>
             <div className="justify-between items-center px-6 py-3">

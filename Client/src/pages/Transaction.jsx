@@ -4,9 +4,10 @@ import { IoMdArrowRoundDown } from "react-icons/io";
 import { FiPlus } from "react-icons/fi";
 import { FiMinus } from "react-icons/fi";
 import { MdArrowOutward } from "react-icons/md";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { AccountContext } from "../context/AccountContext.jsx";
+
 function Transaction() {
-   const [showFilter, setShowFilter] = useState(false);
    
    
 const transactions = [
@@ -50,6 +51,11 @@ const transactions = [
 
   },
 ];
+const [showFilter, setShowFilter] = useState(false);
+  //  const { setTransactions } = useContext(AccountContext);
+  //  useEffect(() => {
+  //     setTransactions(transactions);
+  //     }, []);
 const [filterType, setFilterType] = useState("All Types");
 
 const filteredTransactions =
