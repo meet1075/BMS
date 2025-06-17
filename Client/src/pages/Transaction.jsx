@@ -6,64 +6,28 @@ import { FiMinus } from "react-icons/fi";
 import { MdArrowOutward } from "react-icons/md";
 import { useState, useContext, useEffect } from "react";
 import { AccountContext } from "../context/AccountContext.jsx";
-
+import Transactions from "../data/transactions.js";
+import Accounts from "../data/accounts.js";
 function Transaction() {
-   
-   
-const transactions = [
-  {
-    id: 1,
-    type: 'Deposit',
-    amount: 10,
-    date: 'Jun 14, 2025, 01:31 AM',
-    status: 'completed',
-    direction: 'up',
-    Account:'savings accounts'
-  },
-  {
-    id: 2,
-    type: 'Withdraw',
-    amount: 10,
-    date: 'Jun 14, 2025, 01:31 AM',
-    status: 'completed',
-    direction: 'down',
-    Account:'savings accounts'
+   const { transactions, setTransactions } = useContext(AccountContext);
+   useEffect(()=>{setTransactions(Transactions)},[])
 
-  },
-  {
-    id: 3,
-    type: 'Deposit',
-    amount: 10,
-    date: 'Jun 14, 2025, 01:31 AM',
-    status: 'completed',
-    direction: 'up',
-    Account:'savings accounts'
-
-  },
-  {
-    id: 4,
-    type: 'transfer',
-    amount: 10,
-    date: 'Jun 14, 2025, 01:31 AM',
-    status: 'completed',
-    direction: 'up',
-    Account:'savings accounts'
-
-  },
-];
 const [showFilter, setShowFilter] = useState(false);
-  //  const { setTransactions } = useContext(AccountContext);
-  //  useEffect(() => {
-  //     setTransactions(transactions);
-  //     }, []);
+ 
 const [filterType, setFilterType] = useState("All Types");
 
-const filteredTransactions =
-  filterType === "All Types"
-    ? transactions
-    : transactions.filter(
-        (tx) => tx.type.toLowerCase() === filterType.toLowerCase()
-      );
+const [accountFilter, setAccountFilter] = useState("all");
+
+const filteredTransactions = transactions.filter((tx) => {
+  const typeMatches =
+    filterType === "All Types" ||
+    tx.type.toLowerCase() === filterType.toLowerCase();
+
+  const accountMatches =
+    accountFilter === "all" || tx.AccountNumber === accountFilter;
+
+  return typeMatches && accountMatches;
+});
 
 const depositCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'deposit').length;
 const withdrawCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'withdraw').length;
@@ -82,35 +46,39 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
         </div>
       </div>
       <div className="px-50 py-4 gap-6">
-       
-      {showFilter && (
-  <div className="bg-white rounded-xl border border-gray-200 p-6">
-    <p className="text-lg font-semibold mb-4">Filter Transactions</p>
+        {showFilter && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <p className="text-lg font-semibold mb-4">Filter Transactions</p>
 
-    <div className="grid grid-cols-2 gap-6">
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Account</label>
-        <select className="w-full border border-gray-300 rounded-md px-3 py-2  ">
-          <option>All Accounts</option>
-          <option>savings - 9652972438</option>
-          <option>savings - 3176817090</option>
-        </select>
+          <div className="grid grid-cols-2 gap-6">
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Account</label>
+              <select
+                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                value={accountFilter}
+                onChange={(e) => setAccountFilter(e.target.value)}>
+                <option value="all">All Accounts</option>
+                {Accounts.map((account) => (
+                  <option key={account.id} value={account.number}>
+                    {account.type} - {account.number}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Transaction Type Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
+              <select className="w-full border border-gray-300 rounded-md px-3 py-2 "   value={filterType}onChange={(e) => setFilterType(e.target.value)}>
+                <option>All Types</option>
+                <option>Deposit</option>
+                <option>Withdraw</option>
+                <option>Transfer</option>
+              </select>
+            </div>
+          </div>
+        </div>)}
       </div>
-
-      {/* Transaction Type Dropdown */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
-        <select className="w-full border border-gray-300 rounded-md px-3 py-2 "   value={filterType}onChange={(e) => setFilterType(e.target.value)}>
-          <option>All Types</option>
-          <option>Deposit</option>
-          <option>Withdraw</option>
-          <option>Transfer</option>
-        </select>
-      </div>
-    </div>
-  </div>)}
-</div>
 
       <div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-50 py-4 ">

@@ -8,19 +8,15 @@ import { HiOutlineHashtag } from "react-icons/hi";
 import { useParams } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext";
 import React, { useContext } from 'react';
-// import { GoShieldCheck } from "react-icons/go";
 import { useState } from "react";
 function AccountDetails() {
     const {id}=useParams();
-    const {accounts} = useContext(AccountContext);
-
+    const {accounts, transactions} = useContext(AccountContext);
     const account = accounts.find((ac)=> ac.id === parseInt(id));
-    if (!account) {
-  return <div className="p-6 text-red-500 text-center">Account not found</div>;
-}
+    const transaction = transactions.filter((tx) => tx.AccountNumber === account.number);
 let checkPrimary= account.isPrimary ? "Yes" : "No";   
 let accountType=account.type === "Savings Account" ? "Savings" : "Current";
-    // const accountTransactions=transactions.filter((tx)=>tx.accountId === parseInt(id));
+    
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div >
@@ -89,13 +85,6 @@ let accountType=account.type === "Savings Account" ? "Savings" : "Current";
                                 <p className="text-gray-900 font-semibold">{account.number}</p>
                             </div>
                         </div>
-                        {/* <div className="flex gap-6 py-3 px-4">
-                            <p className="pt-3"><GoShieldCheck className="w-6 h-6"/></p>
-                            <div>
-                                <p className="text-gray-600">Account PIN</p>
-                                <p className="text-gray-900 font-semibold">7858</p>
-                            </div>
-                        </div> */}
                              <hr className="border-t border-gray-200 mx-6" />
                              <div className="px-4 py-3">
                                <div className="flex justify-between items-center py-2">
@@ -122,7 +111,7 @@ let accountType=account.type === "Savings Account" ? "Savings" : "Current";
                         </div>
                         <div  className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Total Transactions</p>
-                            <p className="text-gray-900 font-semibold">2</p>
+                            <p className="text-gray-900 font-semibold">{transaction.length}</p>
                         </div>
                         <div  className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Available Balance</p>
