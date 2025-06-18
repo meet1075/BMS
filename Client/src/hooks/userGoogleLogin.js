@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 
 function userGoogleLogin() {
   const googleLogin=async ({googleId,email})=>{
-    const response = axiosInstance.post('/users/google', {
+    const response = await axiosInstance.post('/users/google', {
       googleId,
       email,
       authType: 'google'

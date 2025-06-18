@@ -3,7 +3,7 @@ import axiosInstance from "../api/axios.js"
 function userLogin() {
 
     const loginUser=async ({email, password})=>{
-        const response=axiosInstance.post('/users/login', {
+        const response= await axiosInstance.post('/users/login', {
             email,
             password,
             authType:'local'

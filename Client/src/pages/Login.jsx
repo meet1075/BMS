@@ -14,7 +14,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [contact, setContact] = useState("");
   const [address, setAddress] = useState("");
-  const [googleId, setGoogleId] = useState(""); 
+const [msg, setMsg] = useState({ text: "", type: "" });
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -23,53 +23,64 @@ function Login() {
   const { mutate: registerUser } = userRegister();
   const { mutate: googleLogin } = userGoogleLogin();
 
-  const handleSubmit=(e)=>{
-    e.preventDefault()
-    const userData={
-      name,
-      email,
-      password,
-      contact,
-      address
-    };
-    if(isLogin){
-      loginUser({email,password},
-        {
-          onSuccess:(data)=>{
-            navigate("/dashboard");
-          },
-           onError: (err) => {
-          alert(err?.response?.data?.message || "Login failed");
-        }, 
-        }
-      )
-    }
-    else{
-      registerUser(userData,
-        {
-          onSuccess:(data)=>{
-            alert("Registration successful! Please log in.");
-            setIsLogin(true);
-          },
-          onError: (err) => {
-            alert(err?.response?.data?.message || "Registration failed");
-          },
-        }
-      )
-    }
+  const handleSubmit = (e) => {
+  e.preventDefault();
+   // Clear previous error
+
+  // Basic validation
+  if (!email || !password || (!isLogin && (!name || !contact || !address))) {
+    setMsg({text:"Please fill in all required fields." , type:"error"});
+    return;
   }
-//   const handleGoogle = () => {
-//     googleLogin({email,googleId},
-//       {
-//         onSuccess:(data)=>{
-//           navigate("/dashboard");
-//         },
-//         onError: (err) => {
-//           alert(err?.response?.data?.message || "Google login failed");
-//         },
-//       }
-//     )
-// };
+
+  // Email validation
+  if (!email.endsWith("@gmail.com")) {
+    setMsg({text:"Email must be a proper Gmail address." , type:"error"});
+    return;
+  }
+
+  // Contact number validation (only for signup)
+  if (!isLogin && !/^\d{10}$/.test(contact)) {
+    setMsg({text:"Contact number must be a 10-digit number." , type:"error"});
+    return;
+  }
+
+  const userData = {
+    name,
+    email,
+    password,
+    contact,
+    address,
+  };
+
+  if (isLogin) {
+    loginUser(
+      { email, password },
+      {
+        onSuccess: () => {
+          navigate("/dashboard");
+        },
+        onError: (err) => {
+          const msg = err?.response?.data?.message || "Login failed";
+          setMsg({ text: msg, type: "error" });
+        },
+      }
+    );
+  } else {
+    registerUser(userData, {
+      onSuccess: () => {
+        setIsLogin(true);
+        setMsg({ text: "Registration successful! Please log in.", type: "success" });
+      },
+      onError: (err) => {
+        const msg = err?.response?.data?.message || "Registration failed";
+        setMsg({ text: msg, type: "error" });
+      },
+    });
+  }
+};
+
+
 const handleGoogleLogin = () => {
   window.location.href = "http://localhost:3000/api/v1/users/google";
 };
@@ -84,6 +95,15 @@ const handleGoogleLogin = () => {
         <h1 className="text-white font-bold text-3xl">SecureBank</h1>
         <p className="text-blue-200">Your trusted banking partner</p>
       </div>
+      {msg.text && (
+  <p
+    className={`text-sm mb-4 ${
+      msg.type === "success" ? "text-green-600" : "text-red-600"
+    }`}
+  >
+    {msg.text}
+  </p>
+)}
 
       <div className="bg-white/10 w-full max-w-md backdrop-blur-sm rounded-2xl p-8 border border-white/20 mt-6">
         <div className="flex gap-4 text-[17px] justify-between w-full h-12 items-center font-semibold text-md mb-6 rounded-lg bg-white/10">
@@ -195,6 +215,7 @@ const handleGoogleLogin = () => {
             className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200"
           >
             {isLogin ? "Sign In" : "Create Account"}
+            
           </button>
 
           {isLogin &&(
