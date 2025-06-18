@@ -118,29 +118,47 @@ const login = asyncHandler(async(req,res)=>{
             refreshToken
         })
     }
-    else if(authType==="google"){
-        if(!(email||googleId)){
-            throw new ApiErrors(400,"Email and Google ID are required for login");
-        }
-        const user=await User.findOne({email,authType:"google"});
-        if(!user){
-            throw new ApiErrors(404,"User not found");
-        }
-        if(user.googleId !== googleId){
-            throw new ApiErrors(401,"Invalid Google ID");
-        }
-        const {accessToken,refreshToken}=await generateAccessAndRefreshToken(user._id);
-        const options={
-            httpOnly:true,
-            secure:process.env.NODE_ENV==="production",
-        }
-        const loggedInUser=await User.findById(user._id).select("-password -refreshToken -googleId");
-        return res
-        .status(200)
-        .cookie("refreshToken",refreshToken,options)
-        .cookie("accessToken",accessToken,options)
-        .json(new ApiResponse(200,{user:loggedInUser,accessToken,refreshToken},"User Logged In Successfully"));
-    }
+    else if (authType === "google") {
+  if (!(email || googleId)) {
+    throw new ApiErrors(400, "Email and Google ID are required for login");
+  }
+
+  let user = await User.findOne({ email, authType: "google" });
+
+  if (!user) {
+    // ✅ auto register
+    user = await User.create({
+      name: "Google User", 
+      email,
+      googleId,
+      authType: "google",
+      role: "customer",
+      contact: "", 
+      address: "",
+      totalAccounts: 0,
+    });
+  }
+
+  if (user.googleId !== googleId) {
+    throw new ApiErrors(401, "Invalid Google ID");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  };
+
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken -googleId");
+
+  return res
+    .status(200)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
+    .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User Logged In Successfully"));
+}
+
 })
 
 const logout = asyncHandler(async(req,res)=>{

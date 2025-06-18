@@ -4,28 +4,76 @@ import { MdEmail, MdLockOutline, MdPhone, MdHome } from "react-icons/md";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
+import userLogin from "../hooks/userLogin.js";
+import userRegister from "../hooks/userRegister";
+import userGoogleLogin from "../hooks/userGoogleLogin";
 
 function Login() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [contact, setContact] = useState("");
+  const [address, setAddress] = useState("");
+  const [googleId, setGoogleId] = useState(""); 
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isLogin) {
-      navigate("/dashboard");
-    } else {
-      setIsLogin(true);
-    }
-  };
+  const { mutate: loginUser } = userLogin();
+  const { mutate: registerUser } = userRegister();
+  const { mutate: googleLogin } = userGoogleLogin();
 
-  const handleGoogle = () => {
-    if (isLogin) {
-      navigate("/dashboard"); 
-    } else {
-      setIsLogin(true); 
+  const handleSubmit=(e)=>{
+    e.preventDefault()
+    const userData={
+      name,
+      email,
+      password,
+      contact,
+      address
+    };
+    if(isLogin){
+      loginUser({email,password},
+        {
+          onSuccess:(data)=>{
+            navigate("/dashboard");
+          },
+           onError: (err) => {
+          alert(err?.response?.data?.message || "Login failed");
+        }, 
+        }
+      )
     }
-  };
+    else{
+      registerUser(userData,
+        {
+          onSuccess:(data)=>{
+            alert("Registration successful! Please log in.");
+            setIsLogin(true);
+          },
+          onError: (err) => {
+            alert(err?.response?.data?.message || "Registration failed");
+          },
+        }
+      )
+    }
+  }
+//   const handleGoogle = () => {
+//     googleLogin({email,googleId},
+//       {
+//         onSuccess:(data)=>{
+//           navigate("/dashboard");
+//         },
+//         onError: (err) => {
+//           alert(err?.response?.data?.message || "Google login failed");
+//         },
+//       }
+//     )
+// };
+const handleGoogleLogin = () => {
+  window.location.href = "http://localhost:3000/api/v1/users/google";
+};
+
 
   return (
     <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex flex-col items-center justify-center px-4 min-h-screen">
@@ -65,6 +113,8 @@ function Login() {
                 type="text"
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
           )}
@@ -77,6 +127,8 @@ function Login() {
                 type="email"
                 className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
@@ -90,6 +142,8 @@ function Login() {
                   type="tel"
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                   placeholder="Enter contact number"
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
                 />
               </div>
             </div>
@@ -104,6 +158,8 @@ function Login() {
                   type="text"
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                   placeholder="Enter your address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                 />
               </div>
             </div>
@@ -117,6 +173,8 @@ function Login() {
                 type={showPassword ? "text" : "password"}
                 className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <button
                 type="button"
@@ -139,22 +197,24 @@ function Login() {
             {isLogin ? "Sign In" : "Create Account"}
           </button>
 
-          <div className="relative my-1">
+          {isLogin &&(
+            <div className="relative my-1">
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-transparent text-gray-300">
                 Or continue with
               </span>
             </div>
-          </div>
-
+          </div>)}
+        {isLogin &&(
           <button
             type="button"
-            onClick={handleGoogle}
+            onClick={handleGoogleLogin}
             className="w-full bg-white/10 hover:bg-white/20 border mt-4 border-white/20 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+            
           >
             <FcGoogle className="h-5 w-5" />
             <span>Google</span>
-          </button>
+          </button>)}
         </form>
       </div>
     </div>
