@@ -11,16 +11,24 @@ const depositMoney=asyncHandler(async (req, res) => {
     if(!isValidObjectId(accountId)){
         throw new ApiErrors(404,"Account ID is required");
     }
-    const {amount} = req.body;
+    const {amount,pin} = req.body;
     if(!amount || amount <= 0){
         throw new ApiErrors(400,"Amount is required and should be greater than zero");
     }
+    if(!pin || pin.length !== 4){
+        throw new ApiErrors(400,"Pin is required and should be 4 digits");
+    }
+
     const account = await Account.findById(accountId);
     if(!account){
         throw new ApiErrors(404,"Account not found");
     }
     if(account.status !== "activate"){
         throw new ApiErrors(400,"Account is not activated");
+    }
+    const isPinCorrect=await account.isPinCorrect(pin);
+    if(!isPinCorrect){  
+        throw new ApiErrors(400,"Incorrect pin");
     }
     let totalAmount = account.balance + amount;
     const transactionId = await generateUniqueTransactionId();
@@ -45,9 +53,12 @@ const withdrawMoney=asyncHandler(async (req, res) => {
     if(!isValidObjectId(accountId)){
         throw new ApiErrors(404,"Account ID is required");
     }
-    const {amount} = req.body;
+    const {amount,pin} = req.body;
     if(!amount || amount <= 0){
         throw new ApiErrors(400,"Amount is required and should be greater than zero");
+    }
+    if(!pin || pin.length !== 4){
+        throw new ApiErrors(400,"Pin is required and should be 4 digits");
     }
     const account = await Account.findById(accountId);
     if(!account){
@@ -58,6 +69,10 @@ const withdrawMoney=asyncHandler(async (req, res) => {
     }
     if(account.balance < amount){
         throw new ApiErrors(400,"Insufficient balance");
+    }
+    const isPinCorrect=await account.isPinCorrect(pin);
+    if(!isPinCorrect){
+        throw new ApiErrors(400,"Incorrect pin");
     }
     let totalAmount = account.balance - amount;
     const transactionId = await generateUniqueTransactionId();
@@ -81,7 +96,10 @@ const transferMoney=asyncHandler(async (req, res) => {
     if(!isValidObjectId(fromAccountId)){
         throw new ApiErrors(404,"From Account ID is required");
     }
-    const {toAccountNumber, amount} = req.body;
+    const {toAccountNumber, amount,pin} = req.body;
+    if(!pin || pin.length !== 4){
+        throw new ApiErrors(400,"Pin is required and should be 4 digits");
+    }
     if(!toAccountNumber){
         throw new ApiErrors(404,"To Account ID is required");
     }
@@ -107,6 +125,10 @@ const transferMoney=asyncHandler(async (req, res) => {
     }
     if(fromAccount.accountNumber === toAccount.accountNumber){
         throw new ApiErrors(400,"Cannot transfer to the same account");
+    }
+    const isPinCorrect=await fromAccount.isPinCorrect(pin);
+    if(!isPinCorrect){
+        throw new ApiErrors(400,"Incorrect pin");
     }
     let totalFromAmount = fromAccount.balance - amount;
     let totalToAmount = toAccount.balance + amount;

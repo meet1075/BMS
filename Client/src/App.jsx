@@ -5,6 +5,7 @@ import Transaction from './pages/Transaction.jsx'
 import Login from './pages/Login.jsx'
 import AccountDetails from './pages/AccountDetails.jsx'
 import AccountCreationModal from './components/AccountCreationModal.jsx'
+import Profile from './pages/Profile.jsx'
 
 function App() {
   const location=useLocation() ;
@@ -18,6 +19,7 @@ function App() {
         <Route path="/transaction" element={<Transaction />}/> 
         <Route path="/account-detail/:id" element={<AccountDetails />} />
         <Route path="/createaccount" element={<AccountCreationModal />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>  
     </>
   )

@@ -7,7 +7,7 @@ import generateUniqueAccountNumber from "../utils/generateAccountNumber.js";
 import generatePin from "../utils/generatePinforAccountNumber.js";
 import { isValidObjectId } from "mongoose";
 const createAccount=asyncHandler(async (req, res) => {
-    const {accountType,balance} = req.body;
+    const {accountType} = req.body;
 
     if (!accountType ) {
       throw new ApiErrors(400, "Account type required");
