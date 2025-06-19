@@ -8,8 +8,10 @@ import { HiOutlineHashtag } from "react-icons/hi";
 import { useParams } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext";
 import React, { useContext } from 'react';
+import { useUser } from "../context/UserContext.jsx";
 import { useState } from "react";
 function AccountDetails() {
+    const { user } = useUser();
     const {id}=useParams();
     const {accounts, transactions} = useContext(AccountContext);
     const account = accounts.find((ac)=> ac.id === parseInt(id));
@@ -68,14 +70,14 @@ let accountType=account.type === "Savings Account" ? "Savings" : "Current";
                             <p className="pt-3"><RiAccountCircleFill className="w-6 h-6"/></p>
                             <div className="flex flex-col">
                                 <p className="text-gray-600">Account Holder</p>
-                                <p className="text-gray-900 font-semibold">John Doe</p>
+                                <p className="text-gray-900 font-semibold">{ user?.name}</p>
                             </div>
                         </div>
                         <div className="flex gap-6 py-3 px-4">
                             <p className="pt-3"><MdEmail className="w-6 h-6"/></p>
                             <div>
                                 <p className="text-gray-600">Email Address</p>
-                                <p className="text-gray-900 font-semibold">john@example.com</p>
+                                <p className="text-gray-900 font-semibold">{user?.email}</p>
                             </div>
                         </div>
                         <div className="flex gap-6 py-3 px-4">

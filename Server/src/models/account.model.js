@@ -47,7 +47,7 @@ accountSchema.pre("save",async function(next){
     }
     next();
 })
-accountSchema.methods.isPasswordCorrect=async function (pin) {
+accountSchema.methods.isPinCorrect=async function (pin) {
         return await bcrypt.compare(pin,this.pin);
     
 }
