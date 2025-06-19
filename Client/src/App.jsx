@@ -6,7 +6,7 @@ import Login from './pages/Login.jsx'
 import AccountDetails from './pages/AccountDetails.jsx'
 import AccountCreationModal from './components/AccountCreationModal.jsx'
 import Profile from './pages/Profile.jsx'
-
+import OAuthCallback from './pages/OAuthCallback.jsx'
 function App() {
   const location=useLocation() ;
   const hideNavBar=location.pathname === "/";
@@ -20,6 +20,8 @@ function App() {
         <Route path="/account-detail/:id" element={<AccountDetails />} />
         <Route path="/createaccount" element={<AccountCreationModal />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
+
       </Routes>  
     </>
   )

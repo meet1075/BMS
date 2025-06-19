@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import userLogin from "../hooks/userLogin.js";
 import userRegister from "../hooks/userRegister";
 import userGoogleLogin from "../hooks/userGoogleLogin";
-
+import { useUser } from "../context/UserContext.jsx";
 function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -21,25 +21,23 @@ const [msg, setMsg] = useState({ text: "", type: "" });
 
   const { mutate: loginUser } = userLogin();
   const { mutate: registerUser } = userRegister();
-  const { mutate: googleLogin } = userGoogleLogin();
-
+  // const { mutate: googleLogin } = userGoogleLogin();
+const { setUser } = useUser();
   const handleSubmit = (e) => {
   e.preventDefault();
-   // Clear previous error
-
-  // Basic validation
+ 
   if (!email || !password || (!isLogin && (!name || !contact || !address))) {
     setMsg({text:"Please fill in all required fields." , type:"error"});
     return;
   }
 
-  // Email validation
+ 
   if (!email.endsWith("@gmail.com")) {
     setMsg({text:"Email must be a proper Gmail address." , type:"error"});
     return;
   }
 
-  // Contact number validation (only for signup)
+  
   if (!isLogin && !/^\d{10}$/.test(contact)) {
     setMsg({text:"Contact number must be a 10-digit number." , type:"error"});
     return;
@@ -57,8 +55,9 @@ const [msg, setMsg] = useState({ text: "", type: "" });
     loginUser(
       { email, password },
       {
-        onSuccess: () => {
-          navigate("/dashboard");
+        onSuccess: (data) => {
+         setUser(data.user); 
+        navigate("/dashboard");
         },
         onError: (err) => {
           const msg = err?.response?.data?.message || "Login failed";

@@ -29,7 +29,7 @@ async (req, res) => {
     res
       .cookie("accessToken", accessToken, { httpOnly: true })
       .cookie("refreshToken", refreshToken, { httpOnly: true })
-      .redirect("http://localhost:5173/dashboard");
+      .redirect(`http://localhost:5173/oauth/callback?token=${accessToken}`);
 }
 
 );

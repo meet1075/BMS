@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { FiCreditCard, FiSettings, FiLogOut } from "react-icons/fi";
 import { BsBank } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-
+import { useUser } from "../context/UserContext.jsx";
+import userLogout from "../hooks/userLogout.js";
 function NavBar() {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const {mutate: logoutUser} = userLogout();
   const dropdownRef = useRef(null);
   useEffect(() => {
     function handleClickOutside(event) {
@@ -17,6 +19,20 @@ function NavBar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+  const { user } = useUser();
+  {user?.name || "User"}
+
+  const handleLogout=()=>{
+    logoutUser({},{
+      onSuccess:()=>{
+        navigate("/");
+      },
+      onError: (error) => {
+        console.error("Logout failed:", error);
+        alert("Logout failed. Please try again.")
+      }
+    })
+  }
 
   return (
     <div className="relative">
@@ -36,7 +52,7 @@ function NavBar() {
             Transactions
           </button>
           <button onClick={() => setDropdownOpen(!dropdownOpen)}className="font-semibold text-gray-800 rounded-full w-25 h-10 bg-[#F3F4F6] hover:bg-[#e2e2ea] px-[13px]">
-            John Doe
+            {user?.name || "User"}
           </button>
           {dropdownOpen && (
             <div className="absolute right-0 top-[60px] w-48 bg-white  rounded-xl shadow-md py-2 z-50">
@@ -47,7 +63,7 @@ function NavBar() {
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 flex items-center gap-2"><FiSettings /> Profile Settings
               </button>
               <button onClick={() => {
-                  navigate("/");
+                  handleLogout();
                   setDropdownOpen(false);
                 }}
                 className="w-full text-left px-4 py-2 hover:bg-red-100 text-red-500 flex items-center gap-2">
