@@ -25,6 +25,7 @@ function NavBar() {
   const handleLogout=()=>{
     logoutUser({},{
       onSuccess:()=>{
+        localStorage.removeItem("accesstoken");
         navigate("/");
       },
       onError: (error) => {

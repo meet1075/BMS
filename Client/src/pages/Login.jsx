@@ -106,7 +106,7 @@ const handleGoogleLogin = () => {
       </div>
       {msg.text && (
   <p
-    className={`text-sm mb-4 ${
+    className={`text-sm -mb-4 rounded-xl bg-white  p-1 ${
       msg.type === "success" ? "text-green-600" : "text-red-600"
     }`}
   >
