@@ -9,14 +9,14 @@ function OAuthCallback() {
   const { setUser } = useUser();
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) {
-      localStorage.setItem("token", token); 
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    const accessToken = searchParams.get("accesstoken");
+    if (accessToken) {
+      localStorage.setItem("accesstoken", accessToken); 
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
       axiosInstance.get("/users/current-customer")
         .then((res) => {
-          setUser(res.data.user);
+          setUser(res.data.data);
           navigate("/dashboard");
         })
         .catch(() => {

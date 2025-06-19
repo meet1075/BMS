@@ -8,7 +8,7 @@ import userLogin from "../hooks/userLogin.js";
 import userRegister from "../hooks/userRegister";
 import userGoogleLogin from "../hooks/userGoogleLogin";
 import { useUser } from "../context/UserContext.jsx";
-import axiosInstance from "../api/axios";
+import axiosInstance from "../api/axios.js";
 
 function Login() {
   const [name, setName] = useState("");

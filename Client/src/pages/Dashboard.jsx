@@ -11,8 +11,9 @@ import { useParams } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext.jsx";
 import { useContext, useEffect } from "react";
 import Accounts from "../data/accounts.js"; 
-
+import { useUser } from "../context/UserContext.jsx";
 function Dashboard() {
+  const { user } = useUser();
   const {setAccounts,accounts} =  useContext(AccountContext);
   useEffect(()=>{setAccounts(Accounts)},[])
   
@@ -27,7 +28,7 @@ function Dashboard() {
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div className="px-35  py-8">
-        <h1 className="font-bold text-3xl text-gray-900 pt-16 mb-2">Welcome back, John Doe</h1>
+        <h1 className="font-bold text-3xl text-gray-900 pt-16 mb-2">Welcome back, {user?.name}</h1>
         <p className="text-gray-600">Manage your accounts and transactions securely</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-35 py-8 ">

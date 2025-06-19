@@ -20,7 +20,7 @@ function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   const { user } = useUser();
-  {user?.name || "User"}
+  {user?.name }
 
   const handleLogout=()=>{
     logoutUser({},{
@@ -52,7 +52,7 @@ function NavBar() {
             Transactions
           </button>
           <button onClick={() => setDropdownOpen(!dropdownOpen)}className="font-semibold text-gray-800 rounded-full w-25 h-10 bg-[#F3F4F6] hover:bg-[#e2e2ea] px-[13px]">
-            {user?.name || "User"}
+            {user?.name}
           </button>
           {dropdownOpen && (
             <div className="absolute right-0 top-[60px] w-48 bg-white  rounded-xl shadow-md py-2 z-50">

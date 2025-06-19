@@ -128,7 +128,7 @@ const login = asyncHandler(async(req,res)=>{
   if (!user) {
     // ✅ auto register
     user = await User.create({
-      name: "Google User", 
+      name: email.split("@")[0], 
       email,
       googleId,
       authType: "google",

@@ -11,7 +11,7 @@ const UserProvider = ({ children }) => {
     if (accesstoken) {
       axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${accesstoken}`;
       axiosInstance.get("/users/current-customer")
-        .then((res) => setUser(res.data.user))
+        .then((res) => setUser(res.data.data))
         .catch(() => setUser(null));
     }
   }, []);
