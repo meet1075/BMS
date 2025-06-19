@@ -8,6 +8,8 @@ import userLogin from "../hooks/userLogin.js";
 import userRegister from "../hooks/userRegister";
 import userGoogleLogin from "../hooks/userGoogleLogin";
 import { useUser } from "../context/UserContext.jsx";
+import axiosInstance from "../api/axios";
+
 function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,20 +54,28 @@ const { setUser } = useUser();
   };
 
   if (isLogin) {
-    loginUser(
-      { email, password },
-      {
-        onSuccess: (data) => {
-         setUser(data.user); 
+  loginUser(
+    { email, password },
+    {
+      onSuccess: (data) => {
+        if (!data.accessToken) {
+    console.error("No accessToken in response!");
+    setMsg({ text: "Login failed: no token", type: "error" });
+    return;
+  }
+        console.log("LOGIN SUCCESS:", data);
+        localStorage.setItem("accesstoken", data.accessToken);
+        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
+        setUser(data.user);
         navigate("/dashboard");
-        },
-        onError: (err) => {
-          const msg = err?.response?.data?.message || "Login failed";
-          setMsg({ text: msg, type: "error" });
-        },
-      }
-    );
-  } else {
+      },
+      onError: (err) => {
+        const msg = err?.response?.data?.message || "Login failed";
+        setMsg({ text: msg, type: "error" });
+      },
+    }
+  );
+}else {
     registerUser(userData, {
       onSuccess: () => {
         setIsLogin(true);

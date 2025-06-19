@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import axiosInstance from "../api/axios";
 
 function OAuthCallback() {
   const [searchParams] = useSearchParams();
@@ -11,25 +12,22 @@ function OAuthCallback() {
     const token = searchParams.get("token");
     if (token) {
       localStorage.setItem("token", token); 
-      const user = parseJwt(token);         
-      setUser(user);                        
-      navigate("/dashboard");              
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      axiosInstance.get("/users/current-customer")
+        .then((res) => {
+          setUser(res.data.user);
+          navigate("/dashboard");
+        })
+        .catch(() => {
+          navigate("/login");
+        });
     } else {
       navigate("/login");
     }
   }, []);
 
   return <p className="text-white mt-10 text-center">Logging in...</p>;
-}
-
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = atob(base64Url);
-    return JSON.parse(base64);
-  } catch (err) {
-    return null;
-  }
 }
 
 export default OAuthCallback;
