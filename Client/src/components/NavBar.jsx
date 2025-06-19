@@ -19,13 +19,13 @@ function NavBar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  const { user } = useUser();
+  const { user, logoutAndClearUser } = useUser();
   {user?.name }
 
   const handleLogout=()=>{
     logoutUser({},{
       onSuccess:()=>{
-        localStorage.removeItem("accesstoken");
+        logoutAndClearUser();
         navigate("/");
       },
       onError: (error) => {
