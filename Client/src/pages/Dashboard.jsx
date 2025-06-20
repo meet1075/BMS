@@ -111,7 +111,7 @@ console.log("Fetched accounts:", accounts);
             <div>
               <p className="flex items-center gap-2 text-gray-900 font-bold text-2xl">Rs {ac.balance}/- <AiOutlineEye className="text-xl text-gray-500"/></p>
             </div>
-            <Link to={`/account-detail/${ac.id}`} key={ac.id}>
+            <Link to={`/account-detail/${ac._id}`} key={ac._id}>
               <button className="flex items-center text-blue-600 hover:text-blue-700 transition-all duration-200 cursor-pointer font-semibold gap-2">
                 View Details <FaArrowRightLong className="mt-1" />
               </button>

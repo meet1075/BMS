@@ -26,7 +26,7 @@ function App() {
           <Transaction />
           </ProtectedRoute>
           }/> 
-        <Route path="/account-detail/:id" element={
+        <Route path="/account-detail/:accountid" element={
           <ProtectedRoute>
           <AccountDetails />
           </ProtectedRoute>

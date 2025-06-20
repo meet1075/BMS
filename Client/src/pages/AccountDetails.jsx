@@ -9,15 +9,23 @@ import { useParams } from "react-router-dom";
 import { AccountContext } from "../context/AccountContext";
 import React, { useContext } from 'react';
 import { useUser } from "../context/UserContext.jsx";
-import { useState } from "react";
+import fetchAccountDetails from "../hooks/fetchAccountDetails.js";
+import { useQuery } from "@tanstack/react-query";
 function AccountDetails() {
     const { user } = useUser();
-    const {id}=useParams();
-    const {accounts, transactions} = useContext(AccountContext);
-    const account = accounts.find((ac)=> ac.id === parseInt(id));
-    const transaction = transactions.filter((tx) => tx.AccountNumber === account.number);
+    const { accountid } = useParams();
+    const { data, isLoading, isError } = useQuery({
+        queryKey: ['accountDetails', accountid],
+        queryFn: () => fetchAccountDetails(accountid),
+        enabled: !!accountid,
+    })
+    const account = data?.data?.account || {};
+    // const {id}=useParams();
+    // const {accounts, transactions} = useContext(AccountContext);
+    // const account = accounts.find((ac)=> ac.id === parseInt(id));
+    // const transaction = transactions.filter((tx) => tx.AccountNumber === account.number);
 let checkPrimary= account.isPrimary ? "Yes" : "No";   
-let accountType=account.type === "Savings Account" ? "Savings" : "Current";
+let accountType=account.accountType === "Savings Account" ? "Savings" : "Current";
     
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
@@ -28,8 +36,8 @@ let accountType=account.type === "Savings Account" ? "Savings" : "Current";
                 <div className='flex items-center gap-4'>
                     <div><FiCreditCard className="rounded-xl p-2 bg-white/30 shadow-blur-sm h-[50px] w-[55px] text-white" /></div>
                     <div>
-                        <h1 className='text-white text-2xl font-bold capitalize'>{ account.type}</h1>
-                        <p className='text-blue-50'>Account Number:{account.number}</p>
+                        <h1 className='text-white text-2xl font-bold capitalize'>{ account.accountType}</h1>
+                        <p className='text-blue-50'>Account Number:{account.accountNumber}</p>
                     </div>
                 </div>
                 <div>
@@ -84,7 +92,7 @@ let accountType=account.type === "Savings Account" ? "Savings" : "Current";
                             <p className="pt-3"><HiOutlineHashtag className="w-6 h-6"/></p>
                             <div>
                                 <p className="text-gray-600">Account Number</p>
-                                <p className="text-gray-900 font-semibold">{account.number}</p>
+                                <p className="text-gray-900 font-semibold">{account.accountNumber}</p>
                             </div>
                         </div>
                              <hr className="border-t border-gray-200 mx-6" />
@@ -109,11 +117,11 @@ let accountType=account.type === "Savings Account" ? "Savings" : "Current";
                         </div>
                         <div className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Created Date</p>
-                            <p className="text-gray-900 font-semibold">{account.createdAt}</p>
+                            <p className="text-gray-900 font-semibold">{new Date(account.createdAt).toLocaleDateString()}</p>
                         </div>
                         <div  className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Total Transactions</p>
-                            <p className="text-gray-900 font-semibold">{transaction.length}</p>
+                            <p className="text-gray-900 font-semibold">0</p>
                         </div>
                         <div  className="flex justify-between items-center py-3 px-4">
                             <p className="text-gray-600">Available Balance</p>

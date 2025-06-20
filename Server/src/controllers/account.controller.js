@@ -75,7 +75,7 @@ const getAccountDetails = asyncHandler(async (req, res) => {
         throw new ApiErrors(400, "Account ID is required");
     }
     const account= await Account.findById(accountId)
-    .select("accountNumber accountType balancs status isPrimary createdAt updatedAt")
+    .select("accountNumber accountType balance status isPrimary createdAt updatedAt")
     .sort({ createdAt: -1 });
     if (!account) {
         throw new ApiErrors(404, "Account not found");
