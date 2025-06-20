@@ -118,11 +118,11 @@ console.log("Fetched accounts:", accounts);
             </Link>
 
           </div>
-          <div>
+          {/* <div>
             <div className="justify-between items-center px-6 py-3">
               <p className="text-gray-500">PIN: {ac.pin}</p>
             </div>
-          </div>
+          </div> */}
           
           </div>
           ))}

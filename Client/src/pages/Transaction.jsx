@@ -8,30 +8,59 @@ import { useState, useContext, useEffect } from "react";
 import { AccountContext } from "../context/AccountContext.jsx";
 import Transactions from "../data/transactions.js";
 import Accounts from "../data/accounts.js";
-function Transaction() {
-   const { transactions, setTransactions } = useContext(AccountContext);
-   useEffect(()=>{setTransactions(Transactions)},[])
+import fetchTransactionData from "../hooks/fetchTransactionData.js";
+import { useUser } from "../context/UserContext.jsx";
+import { useQuery } from "@tanstack/react-query";
+import fetchAccountsByUser from "../hooks/fetchAccountsByUser.js";
 
+function Transaction() {
+  const { user } = useUser();
+  const userId = user?._id;
 const [showFilter, setShowFilter] = useState(false);
  
 const [filterType, setFilterType] = useState("All Types");
 
 const [accountFilter, setAccountFilter] = useState("all");
 
-const filteredTransactions = transactions.filter((tx) => {
+const { data:account, isLoading, isError } = useQuery({
+    queryKey: ['accounts', user?._id],
+    queryFn: () => fetchAccountsByUser(user._id),
+    enabled: !!user?._id, 
+  });
+
+  const accounts = account?.data?.accounts || [];
+
+  const { data } = useQuery({
+  queryKey: ['transactions', userId, filterType, accountFilter],
+  queryFn: () => fetchTransactionData(userId, {
+    type: filterType,
+    accountNumber: accountFilter,
+  }),
+  enabled: !!userId,
+});
+  const Transactions = data?.data || [];
+
+   // const { transactions, setTransactions } = useContext(AccountContext);
+   // useEffect(()=>{setTransactions(Transactions)},[Transactions])
+
+
+
+const filteredTransactions = Transactions.filter((tx) => {
   const typeMatches =
     filterType === "All Types" ||
     tx.type.toLowerCase() === filterType.toLowerCase();
 
   const accountMatches =
-    accountFilter === "all" || tx.AccountNumber === accountFilter;
+    accountFilter === "all" ||
+    tx.fromAccountId?.accountNumber === accountFilter ||
+    tx.toAccountId?.accountNumber === accountFilter;
 
   return typeMatches && accountMatches;
 });
 
-const depositCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'deposit').length;
-const withdrawCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'withdraw').length;
-const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfer').length;
+const depositCount=Transactions.filter((tx)=>tx.type.toLowerCase() === 'deposit').length;
+const withdrawCount=Transactions.filter((tx)=>tx.type.toLowerCase() === 'withdraw').length;
+const transferCount=Transactions.filter((tx)=>tx.type.toLowerCase() === 'transfer').length;
 
 
   return (
@@ -59,9 +88,9 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
                 value={accountFilter}
                 onChange={(e) => setAccountFilter(e.target.value)}>
                 <option value="all">All Accounts</option>
-                {Accounts.map((account) => (
-                  <option key={account.id} value={account.number}>
-                    {account.type} - {account.number}
+                {accounts.map((account) => (
+                  <option key={account._id || account.id} value={account.accountNumber}>
+                    {account.accountType} - {account.accountNumber}
                   </option>
                 ))}
               </select>
@@ -85,7 +114,7 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
           <div  className=" bg-gradient-to-r from-blue-500 to-blue-600 shadow-sm rounded-2xl p-6 flex items-center  justify-between">
             <div>
               <p className="text-blue-100 font-semibold">Total Transactions</p>
-              <p className="text-2xl font-bold text-white">{transactions.length}</p>
+              <p className="text-2xl font-bold text-white">{Transactions.length}</p>
             </div>
           </div>
           <div  className="bg-white rounded-2xl p-6 flex items-center border border-gray-200 justify-between">
@@ -108,51 +137,6 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
           </div>
         </div>
       </div>
-        {/* <div className="px-50 py-4">
-          <div className=" bg-white rounded-xl border border-gray-200">
-            <div>
-            <p className="text-xl font-bold text-gray-800 p-6">3 Transactions</p>
-            </div>
-            <p className=" bg-white rounded-xl border border-gray-200"></p>
-            <div  className="flex justify-between items-center px-6 py-3">
-            <div  className="flex items-center gap-4">
-            <div><IoMdArrowRoundUp  /></div>
-            <div>
-              <p className="text-md font-semibold text-gray-700">Deposit of 10</p>
-              <div className="flex gap-3">
-              <p className="">Jun 14, 2025, 01:31 AM</p>
-              <p className="font-semibold">Deposit</p>
-              <p className="py-1 bg-green-200 text-[11px] text-center items-center justify-center text-green-700 rounded-full px-3">completed</p>
-              </div>
-            </div>
-            </div>
-            <div>
-              <p className="flex items-center gap-1 text-green-600 font-bold text-md"><FiPlus className="text-sm font-bold"/> Rs 10.00/-</p>
-              <p className="text-[14px] text-gray-500 pt-2">Savings Account</p>
-            </div>
-          </div>
-            <p className=" bg-white rounded-xl border border-gray-200"></p>
-            <div  className="flex justify-between items-center px-6 py-3">
-            <div  className="flex items-center gap-4">
-            <div><IoMdArrowRoundDown /></div>
-            <div>
-              <p className="text-md font-semibold text-gray-700">withdraw of 10</p>
-              <div className="flex gap-3">
-              <p className="">Jun 14, 2025, 01:31 AM</p>
-              <p className="font-semibold">Withdraw</p>
-              <p className="py-1 bg-green-200 text-[11px] text-center items-center justify-center text-green-700 rounded-full px-3">completed</p>
-              </div>
-            </div>
-            </div>
-            <div>
-              <p className="flex items-center gap-1 text-red-600 font-bold text-md"><FiMinus className="text-sm font-bold"/> Rs 10.00/-</p>
-              <p className="text-[14px] text-gray-500 pt-2">Savings Account</p>
-            </div>
-          </div>
-          <p className=" bg-white rounded-xl border border-gray-200"></p>
-          </div>
-        </div> */}
-        
         <div className="px-50 py-4">
   <div className="bg-white rounded-xl border border-gray-200 ">
     <p className="text-xl font-bold text-gray-800 p-6 ">
@@ -181,10 +165,10 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
                 {tx.type} of {tx.amount}
               </p>
               <div className="flex gap-3 text-sm text-gray-600">
-                <p>{tx.date}</p>
+                <p>{new Date(tx.createdAt).toLocaleDateString()}</p>
                 <p className="font-semibold capitalize">{tx.type}</p>
                 <p className="py-1 bg-green-200 text-[11px] text-center items-center justify-center text-green-700 rounded-full px-3">
-                  {tx.status}
+                   {tx.status}
                 </p>
               </div>
             </div>
@@ -193,7 +177,7 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
           {/* Right side */}
           <div>
             <p
-              className={`flex items-center gap-1 font-bold text-md ${
+              className={`flex items-center gap-1 font-bold text-[17px] ${
                 tx.type.toLowerCase() === 'withdraw'
                   ? 'text-red-600'
                   : tx.type.toLowerCase() === 'transfer'
@@ -209,7 +193,13 @@ const transferCount=transactions.filter((tx)=>tx.type.toLowerCase() === 'transfe
                 <FiPlus />
               )} Rs {tx.amount}.00/-
             </p>
-            <p className="text-[14px] text-gray-500 pt-2">{tx.Account}</p>
+            {/* <p className="text-[14px] text-gray-500 pt-2">{tx.Account}</p> */}
+              <p className="text-[15px] text-gray-500 pl-8 pt-2">
+              {tx.type.toLowerCase() === 'deposit'
+                ? tx.toAccountId?.accountType
+                : tx.fromAccountId?.accountType}
+            </p>
+
           </div>
         </div>
       </div>

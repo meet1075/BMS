@@ -2,20 +2,35 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiCreditCard } from 'react-icons/fi';
 import { FaPiggyBank } from 'react-icons/fa';
-
+import { useCreateAccount } from '../hooks/createAccount.js';
 function AccountCreationModal() {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState(null);
-
+  const[msg,setMsg]=useState("");
+  const { mutate: createAccount } = useCreateAccount();
+  const handleCreate=()=>{
+    if(!selectedType) return;
+    createAccount(selectedType,{
+      onSuccess:(data)=>{
+        const {pin}=data.data;
+        const mesg= setMsg(`Account created successfully! your PIN is ${pin}.`);
+        setTimeout(() => {
+          setMsg("");
+        
+        setSelectedType(null);
+        navigate("/dashboard")
+        }, 3000);
+      },
+      onError:(error)=>{
+        const mesg=setMsg(`Failed to create account: ${error.response?.data?.message || error.message}`);
+      }
+    })
+  }
   const handleClose = () => {
     navigate('/dashboard');
   };
 
-  const handleCreate = () => {
-    if (selectedType) {
-      navigate('/dashboard');
-    }
-  };
+  
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -26,6 +41,11 @@ function AccountCreationModal() {
       />
      
       <div className="relative bg-blue-200 rounded-2xl border border-gray-200  p-8 w-full max-w-lg mx-4 shadow-xl flex flex-col items-stretch">
+        {msg && (
+          <div className="bg-green-100 text-green-800 p-4 rounded-lg mb-4">
+            <p className="text-sm">{msg}</p>
+          </div>
+        )}
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"

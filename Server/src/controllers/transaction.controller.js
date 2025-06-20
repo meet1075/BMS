@@ -180,31 +180,6 @@ const getAllTransactions=asyncHandler(async (req, res) => {
 
 })
 
-const getTransactionHistoryByAccountId=asyncHandler(async (req, res) => {
-    const {accountId} = req.params;
-    if(!isValidObjectId(accountId)){
-        throw new ApiErrors(404,"Account ID is required");
-    }
-    const account = await Account.findById(accountId);
-    if(!account){
-        throw new ApiErrors(404,"Account not found");
-    }
-    const transaction=await Transaction.find(
-        {
-            $or:[
-                {fromAccountId:accountId},
-                {toAccountId:accountId}
-            ]
-        }       
-    ).populate("toAccountId","accountNumber")
-    .populate("fromAccountId","accountNumber")
-    .select ("toAccountId fromAccountId accountNumber type amount transactionId")
-    
-    return res
-    .status(200)
-    .json(new ApiResponse(200, transaction,"Transaction history retrieved successfully for account"));
-})
-
 const getDepositTransaction=asyncHandler(async (req, res) => {
     const transaction=await Transaction.find({type:"deposit"})
     .populate("toAccountId","accountNumber")
@@ -245,87 +220,71 @@ const getTransferTransaction=asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, transaction,"All transfer transactions retrieved successfully"));
 })
 
-const getDepositTransactionByAccountId=asyncHandler(async (req, res) => {
-    const {accountId} = req.params;
-    if(!isValidObjectId(accountId)){
-        throw new ApiErrors(404,"Account ID is required");
-    }
-    const account = await Account.findById(accountId);
-    if(!account){
-        throw new ApiErrors(404,"Account not found");
-    }
-    const transaction = await Transaction.find({toAccountId: accountId, type: "deposit"})
-    .populate("toAccountId", "accountNumber")
-    .select("toAccountId amount type transactionId")
-    .sort({createdAt: -1});
-    if(!transaction || transaction.length === 0){
-        throw new ApiErrors(404,"No deposit transactions found for this account");
-    }
-    return res
-    .status(200)
-    .json(new ApiResponse(200, transaction,"Deposit transactions retrieved successfully for account"));
-})
+const getTransactionByUserId = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { type, accountNumber } = req.query;
 
-const getWithdrawTransactionByAccountId=asyncHandler(async (req, res) => {
-    const {accountId} = req.params;
-    if(!isValidObjectId(accountId)){
-        throw new ApiErrors(404,"Account ID is required");
-    }
-    const account = await Account.findById(accountId);
-    if(!account){
-        throw new ApiErrors(404,"Account not found");
-    }
-    const transaction = await Transaction.find({fromAccountId: accountId, type: "withdraw"})
-    .populate("fromAccountId", "accountNumber")
-    .select("fromAccountId amount type transactionId")
-    .sort({createdAt: -1});
-    if(!transaction || transaction.length === 0){
-        throw new ApiErrors(404,"No withdraw transactions found for this account");
-    }
-    return res
-    .status(200)
-    .json(new ApiResponse(200, transaction,"withdraw transactions retrieved successfully for account"));
-})
+  if (!isValidObjectId(userId)) {
+    throw new ApiErrors(404, "User ID is required");
+  }
 
-const getTransferTransactionByAccountId=asyncHandler(async (req, res) => {
-    const {accountId} = req.params;
-    if(!isValidObjectId(accountId)){
-        throw new ApiErrors(404,"Account ID is required");
-    }
-    const account = await Account.findById(accountId);
-    if(!account){
-        throw new ApiErrors(404,"Account not found");
-    }
-    const transaction = await Transaction.find({
-            $or:[
-                {fromAccountId:accountId},
-                {toAccountId:accountId}
-            ],
-            type: "transfer"
-        })
-    .populate("toAccountId", "accountNumber")
-    .populate("fromAccountId", "accountNumber")
-    .select("fromAccountId toAccountId amount type transactionId")
-    .sort({createdAt: -1});
-    if(!transaction || transaction.length === 0){
-        throw new ApiErrors(404,"No transfer transactions found for this account");
-    }
-    return res
-    .status(200)
-    .json(new ApiResponse(200, transaction,"transfer transactions retrieved successfully for account"));
-})
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiErrors(404, "User not found");
+  }
 
+  const userAccounts = await Account.find({ userId: user._id }).select("_id");
+
+  const accountIds = userAccounts.map(acc => acc._id.toString());
+
+  const query = {
+    $or: [
+      { fromAccountId: { $in: accountIds } },
+      { toAccountId: { $in: accountIds } }
+    ]
+  };
+
+  if (type && ["deposit", "withdraw", "transfer"].includes(type.toLowerCase())) {
+    query.type = type.toLowerCase();
+  }
+
+  if (accountNumber && accountNumber !== "all") {
+    const account = await Account.findOne({ accountNumber });
+    if (!account) {
+      return res.status(200).json(new ApiResponse(200, [], "No transactions found for this account"));
+    }
+
+    const accountIdStr = account._id.toString();
+
+    // Restrict to only that account
+    query.$or = [
+      { fromAccountId: accountIdStr },
+      { toAccountId: accountIdStr },
+    ];
+  }
+
+  const transactions = await Transaction.find(query)
+    .populate("toAccountId", "accountNumber accountType")
+    .populate("fromAccountId", "accountNumber accountType")
+    .select("fromAccountId toAccountId amount type transactionId status createdAt")
+    .sort({ createdAt: -1 });
+
+  if (!transactions || transactions.length === 0) {
+    return res.status(200).json(new ApiResponse(200, [], "No transactions found for this user"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, transactions, "Transactions retrieved successfully for user"));
+});
 export {
     depositMoney,
     withdrawMoney,
     transferMoney,
     getTransactionById,
     getAllTransactions,
-    getTransactionHistoryByAccountId,
+    getTransactionByUserId,
     getDepositTransaction,
     getWithdrawTransaction,
     getTransferTransaction,
-    getDepositTransactionByAccountId,
-    getWithdrawTransactionByAccountId,
-    getTransferTransactionByAccountId,
 }
