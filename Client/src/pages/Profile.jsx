@@ -3,12 +3,38 @@ import { FaRegUserCircle  } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import useUpdateUserDetails from "../hooks/updateUserDetails";
+import { useUser } from "../context/UserContext";
+import { useState } from "react";
+
 function Profile() {
-    const handleUpdate = () => {
-    alert('Profile Updated');         
-    navigate('/dashboard');            
-  };
     const navigate = useNavigate();
+    const { user, setUser } = useUser();
+    const [name, setName] = useState(user?.name || "");
+    const [email, setEmail] = useState(user?.email || "");
+    const [address, setAddress] = useState(user?.address || "");
+    const [contact, setContact] = useState(user?.contact || "");
+    const [msg, setMsg] = useState("");
+    const [isProcessing, setIsProcessing] = useState(false);
+    const updateUser = useUpdateUserDetails();
+
+    const handleUpdate = async () => {
+      setIsProcessing(true);
+      setMsg("");
+      try {
+        const details = { email, address, contact };
+        const res = await updateUser.mutateAsync(details);
+        setMsg("Profile updated successfully!");
+        // Optionally update user context
+        if (res?.data) setUser(res.data);
+        setTimeout(() => navigate('/dashboard'), 1200);
+      } catch (err) {
+        setMsg(err?.response?.data?.message || "Update failed");
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div >
@@ -36,6 +62,9 @@ function Profile() {
           type="text"
           placeholder="User"
           className="w-full outline-none"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          disabled
         />
       </div>
     </div>
@@ -47,6 +76,32 @@ function Profile() {
           type="email"
           placeholder="email"
           className="w-full outline-none"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+      </div>
+    </div>
+    <div className="mb-5">
+      <label className="block mb-1 font-medium text-gray-700">Address</label>
+      <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2">
+        <input
+          type="text"
+          placeholder="Address"
+          className="w-full outline-none"
+          value={address}
+          onChange={e => setAddress(e.target.value)}
+        />
+      </div>
+    </div>
+    <div className="mb-5">
+      <label className="block mb-1 font-medium text-gray-700">Contact</label>
+      <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2">
+        <input
+          type="text"
+          placeholder="Contact"
+          className="w-full outline-none"
+          value={contact}
+          onChange={e => setContact(e.target.value)}
         />
       </div>
     </div>
@@ -81,9 +136,10 @@ function Profile() {
       </div>
     </div>
 
-    <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all" onClick={handleUpdate}>
-      Update Profile
+    <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all" onClick={handleUpdate} disabled={isProcessing}>
+      {isProcessing ? "Updating..." : "Update Profile"}
     </button>
+    {msg && <div className={`mt-3 text-center rounded-lg p-2 ${msg.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{msg}</div>}
   </div>
 </div>
 
