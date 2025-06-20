@@ -8,23 +8,33 @@ import { PiWallet  } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import fetchAccountsByUser from "../hooks/fetchAccountsByUser.js";
+import { useQuery } from "@tanstack/react-query";
 import { AccountContext } from "../context/AccountContext.jsx";
 import { useContext, useEffect } from "react";
 import Accounts from "../data/accounts.js"; 
 import { useUser } from "../context/UserContext.jsx";
 function Dashboard() {
   const { user } = useUser();
-  const {setAccounts,accounts} =  useContext(AccountContext);
-  useEffect(()=>{setAccounts(Accounts)},[])
-  
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['accounts', user?._id],
+    queryFn: () => fetchAccountsByUser(user._id),
+    enabled: !!user?._id, 
+  });
+
+  const accounts = data?.data?.accounts || [];
+
   let totalbalance = 0;
   accounts.forEach((account) => {
     totalbalance += account.balance;
   });
-  let activeaccounts=0
-  accounts.map((ac)=>{ac.status==="active"?activeaccounts++:activeaccounts=activeaccounts})
+  let activateaccounts=0
+  accounts.map((ac)=>{ac.status==="activate"?activateaccounts++:activateaccounts=activateaccounts}).length
   
-  let primaryAccount=Accounts.length==0?"No Account": Accounts.find((ac)=>ac.isPrimary===true)?.number ;
+  let primaryAccount=accounts.length==0?"No Account": accounts.find((ac)=>ac.isPrimary===true)?.accountNumber ;
+  console.log("User in Dashboard:", user);
+console.log("Fetched accounts:", accounts);
+
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
       <div className="px-35  py-8">
@@ -44,7 +54,7 @@ function Dashboard() {
         <div  className="bg-white rounded-2xl p-6 flex items-center border border-gray-200 justify-between">
           <div>
             <p className="text-gray-600 font-semibold">Active Accounts</p>
-            <p className="text-2xl font-bold text-gray-900">{activeaccounts}</p>
+            <p className="text-2xl font-bold text-gray-900">{activateaccounts}</p>
           </div>
           <div className="text-gray-600 font-semibold text-3xl">
             <FiCreditCard />
@@ -60,7 +70,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
-      {Accounts.length>0?
+      {accounts.length>0?
       <div>
         <div className="flex justify-between items-center py-4 px-35 ">
           <div className="text-gray-900 font-bold text-2xl">
@@ -74,13 +84,13 @@ function Dashboard() {
         </div>
 
         <div className="px-35 py-4">
-            {Accounts.map((ac,index)=>(
+            {accounts.map((ac,index)=>(
 
-          <div key={ac.id||index} className="bg-white rounded-xl border border-gray-200 hover:shadow-lg mb-5">
+          <div key={ac._id||index} className="bg-white rounded-xl border border-gray-200 hover:shadow-lg mb-5">
           <div className="flex justify-between items-center px-6 py-3">
             <div  className="flex items-center gap-4">
               <div>
-                {ac.type === "Savings Account" ? (
+                {ac.accountType === "savings" ? (
                   <FiCreditCard className="rounded-xl p-2 bg-gradient-to-r from-blue-600 to-indigo-600 h-[40px] w-[45px] text-white" />
                 ) : (
                   <PiWallet  className="rounded-xl p-2 bg-gradient-to-r from-blue-600 to-indigo-600 h-[40px] w-[45px] font-bold text-white" />
@@ -88,8 +98,8 @@ function Dashboard() {
               </div>
 
               <div>
-                <p className="text-gray-900 font-semibold text-lg">{ac.type}</p>
-                <p className="text-gray-500">{ac.number}</p>
+                <p className="text-gray-900 font-semibold text-lg">{ac.accountType}</p>
+                <p className="text-gray-500">{ac.accountNumber}</p>
               </div>
             </div>
             <div className="flex gap-4">
