@@ -8,7 +8,10 @@ import { useParams } from "react-router-dom";
 import React, { useContext, useState } from "react";
 import { useUser } from "../context/UserContext.jsx";
 import fetchAccountDetails from "../hooks/fetchAccountDetails.js";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import useDepositMoney from "../hooks/useDepositMoney";
+import useWithdrawMoney from "../hooks/useWithdrawMoney";
+import useTransferMoney from "../hooks/useTransferMoney";
 
 function AccountDetails() {
   const { user } = useUser();
@@ -18,7 +21,7 @@ function AccountDetails() {
     queryFn: () => fetchAccountDetails(accountid),
     enabled: !!accountid,
   });
-
+const [msg, setMsg] = useState("");
   const account = data?.data?.account || {};
   const checkPrimary = account.isPrimary ? "Yes" : "No";
   const accountType = account.accountType === "savings" ? "Savings" : "Current";
@@ -27,20 +30,33 @@ function AccountDetails() {
   const [amount, setAmount] = useState("");
   const [recipientAccount, setRecipientAccount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [pin, setPin] = useState("");
 
-  
+  const depositMutation = useDepositMoney();
+  const withdrawMutation = useWithdrawMoney();
+  const transferMutation = useTransferMoney();
+
+  const queryClient = useQueryClient();
 
   const handleTransaction = async (type) => {
     setIsProcessing(true);
     try {
-      if (!amount || (type === "transfer" && !recipientAccount)) return;
-      await new Promise((res) => setTimeout(res, 1000));
-      alert(`${type} of Rs ${amount} ${type === 'transfer' ? `to ${recipientAccount}` : ''} done successfully!`);
+      if (!amount || (type === "transfer" && !recipientAccount) || !pin) return;
+      if (type === "deposit") {
+        await depositMutation.mutateAsync({ accountId: accountid, amount: Number(amount), pin });
+      } else if (type === "withdraw") {
+        await withdrawMutation.mutateAsync({ accountId: accountid, amount: Number(amount), pin });
+      } else if (type === "transfer") {
+        await transferMutation.mutateAsync({ fromAccountId: accountid, toAccountNumber: recipientAccount, amount: Number(amount), pin });
+      }
       setActiveModal(null);
       setAmount("");
       setRecipientAccount("");
+      setPin("");
+      setMsg(`${type.charAt(0).toUpperCase() + type.slice(1)} successful!`);
+      queryClient.invalidateQueries({ queryKey: ["accountDetails", accountid] });
     } catch (err) {
-      alert("Transaction failed");
+      setMsg(err?.response?.data?.message || "Transaction failed");
     } finally {
       setIsProcessing(false);
     }
@@ -165,6 +181,11 @@ function AccountDetails() {
         {activeModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl max-w-md w-full p-6">
+                {msg && (
+                  <div className="bg-green-100 text-green-800 p-4 rounded-lg mb-4">
+                    <p className="text-sm">{msg}</p>
+                    </div>
+                )}
               <h3 className="text-xl font-bold text-gray-900 mb-4 capitalize">{activeModal} Money</h3>
               <div className="space-y-4">
                 <div>
@@ -201,9 +222,13 @@ function AccountDetails() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Pin</label>
                     <input
                         type="password"
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Enter your pin"
-                        />
+                        maxLength={4}
+                        minLength={4}
+                    />
                   </div> 
                 <div className="flex space-x-3 mt-6">
                   <button
@@ -214,10 +239,10 @@ function AccountDetails() {
                   </button>
                   <button
                     onClick={() => handleTransaction(activeModal)}
-                    disabled={isProcessing || !amount || (activeModal === "transfer" && !recipientAccount)}
+                    disabled={isProcessing || !amount || (activeModal === "transfer" && !recipientAccount) || !pin}
                     className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isProcessing ? "Processing..." : `${activeModal} Money`}
+                    {isProcessing ? "Processing..." : `${activeModal.charAt(0).toUpperCase() + activeModal.slice(1)} Money`}
                   </button>
                 </div>
               </div>

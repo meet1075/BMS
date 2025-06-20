@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import fetchAccountsByUser from "../hooks/fetchAccountsByUser.js";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AccountContext } from "../context/AccountContext.jsx";
 import { useContext, useEffect } from "react";
 import Accounts from "../data/accounts.js"; 
@@ -34,6 +34,12 @@ function Dashboard() {
   let primaryAccount=accounts.length==0?"No Account": accounts.find((ac)=>ac.isPrimary===true)?.accountNumber ;
   console.log("User in Dashboard:", user);
 console.log("Fetched accounts:", accounts);
+
+  const queryClient = useQueryClient();
+
+  const refetchAccounts = () => {
+    queryClient.invalidateQueries({ queryKey: ['accounts', user?._id] });
+  };
 
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>

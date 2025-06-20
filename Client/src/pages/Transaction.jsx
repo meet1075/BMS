@@ -10,7 +10,7 @@ import Transactions from "../data/transactions.js";
 import Accounts from "../data/accounts.js";
 import fetchTransactionData from "../hooks/fetchTransactionData.js";
 import { useUser } from "../context/UserContext.jsx";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import fetchAccountsByUser from "../hooks/fetchAccountsByUser.js";
 
 function Transaction() {
@@ -43,7 +43,7 @@ const { data:account, isLoading, isError } = useQuery({
    // const { transactions, setTransactions } = useContext(AccountContext);
    // useEffect(()=>{setTransactions(Transactions)},[Transactions])
 
-
+const queryClient = useQueryClient();
 
 const filteredTransactions = Transactions.filter((tx) => {
   const typeMatches =
@@ -62,6 +62,10 @@ const depositCount=Transactions.filter((tx)=>tx.type.toLowerCase() === 'deposit'
 const withdrawCount=Transactions.filter((tx)=>tx.type.toLowerCase() === 'withdraw').length;
 const transferCount=Transactions.filter((tx)=>tx.type.toLowerCase() === 'transfer').length;
 
+const refetchAll = () => {
+  queryClient.invalidateQueries({ queryKey: ['accounts', user?._id] });
+  queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
+};
 
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-indigo-50 md:min-h-screen min-h-screen'>
