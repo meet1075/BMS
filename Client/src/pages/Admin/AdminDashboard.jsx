@@ -52,7 +52,8 @@ function AdminDashboard() {
     }
   })
 
-  const users = usersData?.data || [];
+  // Only show non-admin users in the User Management section
+  const users = (usersData?.data || []).filter(user => user.role !== "admin");
   const accounts = accountsData?.data?.accounts || [];
   const transactions = transactionsData?.data?.transactions || [];
   

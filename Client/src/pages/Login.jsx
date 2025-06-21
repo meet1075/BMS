@@ -67,7 +67,11 @@ const { setUser } = useUser();
         localStorage.setItem("accesstoken", data.accessToken);
         axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
         setUser(data.user);
-        navigate("/dashboard");
+        if (data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
       },
       onError: (err) => {
         const msg = err?.response?.data?.message || "Login failed";
