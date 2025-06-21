@@ -7,7 +7,8 @@ import AccountDetails from './pages/AccountDetails.jsx'
 import AccountCreationModal from './components/AccountCreationModal.jsx'
 import Profile from './pages/Profile.jsx'
 import OAuthCallback from './pages/OAuthCallback.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
+import { ProtectedRoute, AdminProtectedRoute } from './components/ProtectedRoute.jsx'
+import AdminDashboard from './pages/Admin/AdminDashboard.jsx'
 function App() {
   const location=useLocation() ;
   const hideNavBar=location.pathname === "/";
@@ -20,6 +21,11 @@ function App() {
           <ProtectedRoute>
           <Dashboard />
           </ProtectedRoute>
+          } />
+        <Route path="/admin" element={
+          <AdminProtectedRoute>
+          <AdminDashboard />
+          </AdminProtectedRoute>
           } />
         <Route path="/transaction" element={
           <ProtectedRoute>
@@ -37,9 +43,9 @@ function App() {
           </ProtectedRoute>
           } />
         <Route path="/profile" element={
-          <protectedRoute>
+          <ProtectedRoute>
           <Profile />
-          </protectedRoute>
+          </ProtectedRoute>
           } />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
 

@@ -77,7 +77,7 @@ const [msg, setMsg] = useState("");
               </div>
               <div>
                 <p className="flex justify-center items-center gap-2 text-white text-3xl font-bold">
-                  Rs {account.balance}/- <AiOutlineEye />
+                  Rs {account.balance}/-
                 </p>
                 <p className="text-blue-100">Available Balance</p>
               </div>

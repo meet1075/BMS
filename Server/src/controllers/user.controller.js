@@ -1,5 +1,6 @@
 import {asyncHandler} from "../utils/asyncHandler.js";
 import {User} from "../models/user.model.js";
+import {Account} from "../models/account.model.js";
 import {ApiErrors} from "../utils/ApiErrors.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -334,13 +335,30 @@ const getAllUsers = asyncHandler(async (req, res) => {
 if (req.user.role !== "admin") {
     throw new ApiErrors(403, "Only admin can access this route");
     }
-    const users=await User.find()
-    .select("name isActive role")
-    .sort({createdAt:-1});
+    
+    // Get all users with basic info
+    const users = await User.find()
+        .select("name isActive role totalAccounts createdAt")
+        .sort({createdAt:-1});
+
+    // Get account information for each user
+    const usersWithAccounts = await Promise.all(
+        users.map(async (user) => {
+            const accounts = await Account.find({ userId: user._id })
+                .select("accountNumber accountType balance status isPrimary")
+                .sort({ createdAt: -1 });
+            
+            return {
+                ...user.toObject(),
+                accounts: accounts,
+                primaryAccount: accounts.find(acc => acc.isPrimary) || null
+            };
+        })
+    );
 
     return res
         .status(200)
-        .json(new ApiResponse(200, users, "All users fetched successfully"));
+        .json(new ApiResponse(200, usersWithAccounts, "All users fetched successfully"));
 })
 export {register,
         login ,

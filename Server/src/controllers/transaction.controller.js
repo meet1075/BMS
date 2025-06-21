@@ -166,18 +166,20 @@ const getTransactionById=asyncHandler(async (req, res) => {
 })
 
 const getAllTransactions=asyncHandler(async (req, res) => {
-    const transaction=await Transaction.find()
-    .populate("toAccountId","accountNumber")
-    .populate("fromAccountId","accountNumber")
-    .select("fromAccountId toAccountId amount type")
-    .sort({createdAt: -1});
-    if(!transaction || transaction.length === 0){
+    const transactions = await Transaction.find()
+        .populate("toAccountId", "accountNumber accountType")
+        .populate("fromAccountId", "accountNumber accountType")
+        .populate("userId", "name email")
+        .select("fromAccountId toAccountId amount type transactionId status createdAt userId")
+        .sort({createdAt: -1});
+    
+    if(!transactions || transactions.length === 0){
         throw new ApiErrors(404,"No transactions found");
     }
+    
     return res
-    .status(200)
-    .json(new ApiResponse(200, transaction,"All transactions retrieved successfully"));
-
+        .status(200)
+        .json(new ApiResponse(200, { transactions }, "All transactions retrieved successfully"));
 })
 
 const getDepositTransaction=asyncHandler(async (req, res) => {

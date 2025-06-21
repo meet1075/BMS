@@ -20,7 +20,8 @@ function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   const { user, logoutAndClearUser } = useUser();
-  {user?.name }
+  let userRole=user?.role
+  {user?.name, userRole }
 
   const handleLogout=()=>{
     logoutUser({},{
@@ -43,15 +44,29 @@ function NavBar() {
           <BsBank className="rounded-xl p-2 bg-gradient-to-r from-blue-500 to-indigo-700 h-[40px] w-[45px] text-white" />SecureBank
         </div>
         <div className="flex flex-row gap-4 items-center relative" ref={dropdownRef}>
-          <button
-            className="hover:text-blue-700 font-medium text-gray-700 flex items-center gap-2 cursor-pointer"onClick={() => navigate("/dashboard")}>
-            <FiCreditCard className="h-5 w-6 mt-1" />Dashboard
-          </button>
-
-          <button
-            className="hover:text-blue-700 font-medium text-gray-700 cursor-pointer p-2"onClick={() => navigate("/transaction")}>
-            Transactions
-          </button>
+          {userRole === "admin" ? (
+            <button
+              className="hover:text-blue-700 font-medium text-gray-700 flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate("/admin")}
+            >
+              Admin Dashboard
+            </button>
+          ) : (
+            <>
+              <button
+                className="hover:text-blue-700 font-medium text-gray-700 flex items-center gap-2 cursor-pointer"
+                onClick={() => navigate("/dashboard")}
+              >
+                Dashboard
+              </button>
+              <button
+                className="hover:text-blue-700 font-medium text-gray-700 cursor-pointer p-2"
+                onClick={() => navigate("/transaction")}
+              >
+                Transactions
+              </button>
+            </>
+          )}
           <button onClick={() => setDropdownOpen(!dropdownOpen)}className="font-semibold text-gray-800 rounded-full w-25 h-10 bg-[#F3F4F6] hover:bg-[#e2e2ea] px-[13px]">
             {user?.name}
           </button>
