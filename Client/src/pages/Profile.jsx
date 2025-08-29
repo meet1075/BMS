@@ -44,8 +44,8 @@ function Profile() {
             <div className="flex items-center gap-4 mt-6">
                 <div className="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl w-14 h-14 p-3"><FaRegUserCircle  className="w-8 text-white  h-8"/></div>
                 <div className="flex flex-col ">
-                    <p className="text-3xl font-bold text-gray-900">User</p>
-                    <p className="font-semibold text-gray-600 pl-1">user@gmail.com</p>
+                    <p className="text-3xl font-bold text-gray-900">{name}</p>
+                    <p className="font-semibold text-gray-600 pl-1">{email}</p>
                 </div>
             </div>
             <div className="mt-10 bg-white p-8 rounded-2xl shadow-md max-w-2xl">
@@ -78,6 +78,7 @@ function Profile() {
           className="w-full outline-none"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          disabled
         />
       </div>
     </div>
