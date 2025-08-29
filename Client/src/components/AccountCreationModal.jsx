@@ -19,7 +19,7 @@ function AccountCreationModal() {
         
         setSelectedType(null);
         navigate("/dashboard")
-        }, 3000);
+        }, 60000);
       },
       onError:(error)=>{
         const mesg=setMsg(`Failed to create account: ${error.response?.data?.message || error.message}`);
