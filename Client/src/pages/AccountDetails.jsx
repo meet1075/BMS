@@ -127,14 +127,14 @@ const [msg, setMsg] = useState("");
                   </div>
                 </div>
                 <div className="flex gap-6 py-3 px-4">
-                  <MdEmail className="w-6 h-6 pt-3" />
+                  <MdEmail className="size-10 pt-3" />
                   <div>
                     <p className="text-gray-600">Email Address</p>
                     <p className="text-gray-900 font-semibold">{user?.email}</p>
                   </div>
                 </div>
                 <div className="flex gap-6 py-3 px-4">
-                  <HiOutlineHashtag className="w-6 h-6 pt-3" />
+                  <HiOutlineHashtag className="size-10 pt-3" />
                   <div>
                     <p className="text-gray-600">Account Number</p>
                     <p className="text-gray-900 font-semibold">{account.accountNumber}</p>
