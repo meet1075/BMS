@@ -120,7 +120,7 @@ const [msg, setMsg] = useState("");
               <h1 className="text-gray-900 font-bold text-xl px-2">Account Information</h1>
               <div>
                 <div className="flex gap-6 py-3 px-4">
-                  <RiAccountCircleFill className="w-6 h-6 pt-3" />
+                  <RiAccountCircleFill className="size-10 pt-3" />
                   <div>
                     <p className="text-gray-600">Account Holder</p>
                     <p className="text-gray-900 font-semibold">{user?.name}</p>

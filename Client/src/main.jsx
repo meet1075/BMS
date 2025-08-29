@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')).render(
       <AccountProvider>
         <QueryClientProvider client={new QueryClient()}>
           <App />
-          <ReactQueryDevtools initialIsOpen={false} />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
       </AccountProvider>
     </UserProvider>
