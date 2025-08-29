@@ -67,7 +67,8 @@ const { setUser } = useUser();
         localStorage.setItem("accesstoken", data.accessToken);
         axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
         setUser(data.user);
-        if (data.user.role === "admin") {
+        const role = (data.user.role || '').toString().toLowerCase();
+        if (role === "admin") {
           navigate("/admin");
         } else {
           navigate("/dashboard");

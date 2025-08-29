@@ -18,7 +18,7 @@ function AdminDashboard() {
   const {data: usersData, isLoading: usersLoading, error: usersError}=useQuery({
     queryKey: ['users'],
     queryFn: fetchAllUser,
-    enabled: !!user?._id && user?.role === 'admin',
+    enabled: !!user?._id && (user?.role || '').toString().toLowerCase() === 'admin',
     onSuccess: (data) => {
       console.log('Admin Dashboard - Users data:', data);
     },
@@ -31,7 +31,7 @@ function AdminDashboard() {
   const {data: accountsData, isLoading: accountsLoading, error: accountsError}=useQuery({
     queryKey: ['accounts'],
     queryFn: fetchAllAccounts,
-    enabled: !!user?._id && user?.role === 'admin',
+    enabled: !!user?._id && (user?.role || '').toString().toLowerCase() === 'admin',
     onSuccess: (data) => {
       console.log('Admin Dashboard - Accounts data:', data);
     },
@@ -44,7 +44,7 @@ function AdminDashboard() {
   const {data: transactionsData, isLoading: transactionsLoading, error: transactionsError}=useQuery({
     queryKey: ['transactions'],
     queryFn: fetchAllTransactions,
-    enabled: !!user?._id && user?.role === 'admin',
+    enabled: !!user?._id && (user?.role || '').toString().toLowerCase() === 'admin',
     onSuccess: (data) => {
       console.log('Admin Dashboard - Transactions data:', data);
     },

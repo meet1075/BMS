@@ -1,5 +1,5 @@
 import Dashboard from './pages/Dashboard.jsx'
-import {Routes, Route, useLocation} from 'react-router-dom'
+import {Routes, Route, useLocation, Navigate} from 'react-router-dom'
 import NavBar from './components/NavBar.jsx'
 import Transaction from './pages/Transaction.jsx'
 import Login from './pages/Login.jsx'
@@ -9,14 +9,25 @@ import Profile from './pages/Profile.jsx'
 import OAuthCallback from './pages/OAuthCallback.jsx'
 import { ProtectedRoute, AdminProtectedRoute } from './components/ProtectedRoute.jsx'
 import AdminDashboard from './pages/Admin/AdminDashboard.jsx'
+import { useUser } from './context/UserContext.jsx'
 function App() {
   const location=useLocation() ;
+  const { user } = useUser();
   const hideNavBar=location.pathname === "/";
   return (
     <>
     {!hideNavBar && <NavBar />}
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            user ? (
+              <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />
+            ) : (
+              <Login />
+            )
+          }
+        />
         <Route path="/dashboard" element={
           <ProtectedRoute>
           <Dashboard />

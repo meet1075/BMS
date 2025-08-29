@@ -17,7 +17,8 @@ function OAuthCallback() {
       axiosInstance.get("/users/current-customer")
         .then((res) => {
           setUser(res.data.data);
-          navigate("/dashboard");
+          const role = (res.data.data.role || '').toString().toLowerCase();
+          navigate(role === 'admin' ? '/admin' : '/dashboard');
         })
         .catch(() => {
           navigate("/login");

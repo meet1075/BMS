@@ -20,7 +20,7 @@ function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   const { user, logoutAndClearUser } = useUser();
-  let userRole=user?.role
+  let userRole=(user?.role || '').toString().toLowerCase();
   {user?.name, userRole }
 
   const handleLogout=()=>{
@@ -40,7 +40,9 @@ function NavBar() {
     <div className="relative">
       <div className="bg-white flex justify-between items-center px-35 w-full h-[60px] fixed shadow-sm z-50">
         <div
-          className="text-blue-600 font-bold text-xl flex items-center cursor-pointer gap-2"onClick={() => navigate("/dashboard")}>
+          className="text-blue-600 font-bold text-xl flex items-center cursor-pointer gap-2"
+          onClick={() => navigate(userRole === 'admin' ? '/admin' : '/dashboard')}
+        >
           <BsBank className="rounded-xl p-2 bg-gradient-to-r from-blue-500 to-indigo-700 h-[40px] w-[45px] text-white" />SecureBank
         </div>
         <div className="flex flex-row gap-4 items-center relative" ref={dropdownRef}>
