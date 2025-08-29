@@ -2,6 +2,7 @@ import { LuUsers } from "react-icons/lu";
 import { LuCreditCard } from "react-icons/lu";
 import { GrTransaction } from "react-icons/gr";
 import { FaUserLarge } from "react-icons/fa6";
+import { PiWallet  } from "react-icons/pi";
 import { useQuery,useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../../context/UserContext.jsx";
 import fetchAllUser from "../../hooks/fetchAllUser.js";
@@ -177,7 +178,13 @@ function AdminDashboard() {
                     <div key={account._id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className=" bg-gradient-to-r from-blue-500 to-indigo-500 p-3 rounded-xl">
-                          <LuCreditCard className="w-8 h-8 text-white" />
+                          {account.accountType==='savings'?
+                             <LuCreditCard className="w-8 h-8 text-white" />
+                             :
+                             <PiWallet className="w-8 h-8 text-white" />
+
+                          }
+                          
                         </div>
                         <div>
                           <p className="font-bold text-xl text-gray-900">{account.accountType} Account</p>

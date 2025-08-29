@@ -59,7 +59,7 @@ function AccountCreationModal() {
             onClick={() => setSelectedType('savings')}
             className={`w-full flex items-center gap-4 p-4 border rounded-xl transition-all duration-150 text-left ${selectedType === 'savings' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-blue-300'}`}
           >
-            <span className="text-3xl text-blue-600"><FaPiggyBank /></span>
+            <span className="text-3xl text-blue-600"><FiCreditCard /></span>
             <span>
               <span className="block font-semibold text-lg">Savings Account</span>
               <span className="block text-gray-500 text-sm">Perfect for saving money with competitive interest rates</span>
@@ -69,7 +69,7 @@ function AccountCreationModal() {
             onClick={() => setSelectedType('current')}
             className={`w-full flex items-center gap-4 p-4 border rounded-xl transition-all duration-150 text-left ${selectedType === 'current' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-blue-300'}`}
           >
-            <span className="text-3xl text-blue-600"><FiCreditCard /></span>
+            <span className="text-3xl text-blue-600"><FaPiggyBank /></span>
             <span>
               <span className="block font-semibold text-lg">Current Account</span>
               <span className="block text-gray-500 text-sm">Ideal for daily transactions and business use</span>
